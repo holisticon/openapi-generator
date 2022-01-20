@@ -1,0 +1,7 @@
+{{#bodyParam}}val {{#bodyParam}}{{paramName}}{{/bodyParam}} = request.body {{/bodyParam}}
+{{#queryParams}}
+val {{paramName}} = request.queryParameters["{{paramName}}"]{{#isArray}}?.split(",")?.toTypedArray() ?: emptyArray(){{/isArray}}{{^isArray}}{{#defaultValue}} ?: {{defaultValue}}{{/defaultValue}}{{^defaultValue}}{{#required}}!!{{/required}}{{/defaultValue}}{{/isArray}}
+{{/queryParams}}
+{{#headerParams}}
+val {{paramName}} = request.queryParameters["{{paramName}}"]
+{{/headerParams}}

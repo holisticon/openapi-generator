@@ -1,0 +1,8 @@
+generatorName: kotlin-azure-function-app
+#TODO should be openapi3
+outputDir: samples/server/petstore/kotlin-azure-function-app
+inputSpec: modules/openapi-generator/src/test/resources/3_0/petstore.yaml
+templateDir: modules/openapi-generator/src/main/resources/kotlin-azure-function-app
+sourceFolder: src/gen/kotlin
+additionalProperties:
+  hideGenerationTimestamp: "true"

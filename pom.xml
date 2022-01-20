@@ -1300,6 +1300,30 @@
                 <module>samples/client/petstore/java/apache-httpclient</module>
             </modules>
         </profile>
+      <profile>
+        <id>azure</id>
+        <activation>
+          <activeByDefault>true</activeByDefault>
+        </activation>
+        <modules>
+          <!-- servers -->
+          <module>samples/server/petstore/kotlin-azure-function-app</module>
+        </modules>
+      </profile>
+        <!-- test with JDK11 in drone.io -->
+        <profile>
+            <id>samples.droneio</id>
+            <activation>
+                <property>
+                    <name>env</name>
+                    <value>samples.droneio</value>
+                </property>
+            </activation>
+            <modules>
+                <!-- clients -->
+                <module>samples/client/petstore/java/native</module>
+            </modules>
+        </profile>
         <!-- test with Haskell -->
         <profile>
             <id>samples.misc</id>

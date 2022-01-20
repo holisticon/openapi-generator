@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.openapitools</groupId>
+    <artifactId>kotlin-azure-function-app</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Azure Functions OpenAPI Petstore</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <java.version>8</java.version>
+        <kotlin.version>1.6.0</kotlin.version>
+        <azure.functions.maven.plugin.version>1.14.0</azure.functions.maven.plugin.version>
+        <azure.functions.java.library.version>1.4.2</azure.functions.java.library.version>
+        <functionAppName>Petstore Azure Functions App</functionAppName>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.microsoft.azure.functions</groupId>
+            <artifactId>azure-functions-java-library</artifactId>
+            <version>${azure.functions.java.library.version}</version>
+        </dependency>
+
+        <!-- Kotlin -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.moshi</groupId>
+            <artifactId>moshi</artifactId>
+            <version>1.13.0</version>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>openapi-generator-maven-plugin</artifactId>
+            <!-- RELEASE_VERSION -->
+            <version>5.3.1-SNAPSHOT</version>
+            <!-- /RELEASE_VERSION -->
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <!--<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>-->
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/src/gen/kotlin</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+           <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+
+                <!-- RELEASE_VERSION -->
+                <version>5.3.1-SNAPSHOT</version>
+                <!-- /RELEASE_VERSION -->
+                <executions>
+                    <execution>
+                        <id>generate-backend-api-code</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>modules/openapi-generator/src/test/resources/3_0/petstore.yaml</inputSpec>
+                            <generatorName>kotlin-azure-function-app</generatorName>
+                            <!--<library>spring-boot</library>-->
+                            <apiPackage>${project.groupId}.api</apiPackage>
+                            <modelPackage>${project.groupId}.api.model</modelPackage>
+                            <!--<additionalProperties>lala=${project.basedir}/src/main/resources/config.yaml</additionalProperties>-->
+                            <configOptions>
+                             <!--<lala>${project.basedir}/src/main/resources/config.yaml</lala>-->
+                                <sourceFolder>src/gen/kotlin</sourceFolder>
+                                <delegatePattern>true</delegatePattern>
+                                <enumPropertyNaming>UPPERCASE</enumPropertyNaming>
+                                <openApiNullable>false</openApiNullable>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useTags>true</useTags>
+                                <azureExtensionsFile>samples/server/petstore/kotlin-azure-function-app/model/kotlinAzureExtensionModel.yaml</azureExtensionsFile>
+                            </configOptions>
+                           <!-- <modelNameSuffix>Dto</modelNameSuffix>-->
+                            <typeMappings>
+                                <typeMapping>Integer=lang.Long</typeMapping>
+                            </typeMappings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.microsoft.azure</groupId>
+                <artifactId>azure-functions-maven-plugin</artifactId>
+                <version>${azure.functions.maven.plugin.version}</version>
+                <configuration>
+                    <!-- function app name -->
+                    <appName>${functionAppName}</appName>
+                    <!-- function app resource group -->
+                    <resourceGroup>java-functions-group</resourceGroup>
+                    <!-- function app service plan name -->
+                    <appServicePlanName>java-functions-app-service-plan</appServicePlanName>
+                    <!-- function app region-->
+                    <!-- refers https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Functions:-Configuration-Details#supported-regions for all valid values -->
+                    <region>westus</region>
+                    <!-- function pricingTier, default to be consumption if not specified -->
+                    <!-- refers https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Functions:-Configuration-Details#supported-pricing-tiers for all valid values -->
+                    <!-- <pricingTier></pricingTier> -->
+
+                    <!-- Whether to disable application insights, default is false -->
+                    <!-- refers https://github.com/microsoft/azure-maven-plugins/wiki/Azure-Functions:-Configuration-Details for all valid configurations for application insights-->
+                    <!-- <disableAppInsights></disableAppInsights> -->
+                    <runtime>
+                        <!-- runtime os, could be windows, linux or docker-->
+                        <os>windows</os>
+                        <javaVersion>8</javaVersion>
+                        <!-- for docker function, please set the following parameters -->
+                        <!-- <image>[hub-user/]repo-name[:tag]</image> -->
+                        <!-- <serverId></serverId> -->
+                        <!-- <registryUrl></registryUrl>  -->
+                    </runtime>
+                    <appSettings>
+                        <property>
+                            <name>FUNCTIONS_EXTENSION_VERSION</name>
+                            <value>~3</value>
+                        </property>
+                    </appSettings>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>package-functions</id>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>test-compile</id>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--Remove obj folder generated by .NET SDK in maven clean-->
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+              <!--  <version>3.1.0</version>-->
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>obj</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,57 @@
+package {{package}}
+
+{{#imports}}import {{import}}
+{{/imports}}
+{{#swaggerAnnotations}}
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.ApiParam
+import io.swagger.annotations.ApiResponse
+import io.swagger.annotations.ApiResponses
+import io.swagger.annotations.Authorization
+import io.swagger.annotations.AuthorizationScope
+{{/swaggerAnnotations}}
+
+import kotlin.collections.List
+import kotlin.collections.Map
+
+
+import com.microsoft.azure.*
+import com.microsoft.azure.functions.*
+import com.microsoft.azure.functions.annotation.*
+
+import javax.naming.Binding;
+
+
+{{#swaggerAnnotations}}
+@Api(value = "{{{baseName}}}", description = "The {{{baseName}}} API")
+{{/swaggerAnnotations}}
+{{#operations}}
+class {{classname}}: {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api() {
+{{#operation}}
+
+  {{#swaggerAnnotations}}
+  @ApiOperation(
+    value = "{{{summary}}}",
+    nickname = "{{{operationId}}}",
+    notes = "{{{notes}}}"{{#returnBaseType}},
+    response = {{{.}}}::class{{/returnBaseType}}{{#returnContainer}},
+    responseContainer = "{{{.}}}"{{/returnContainer}}{{#hasAuthMethods}},
+    authorizations = [{{#authMethods}}Authorization(value = "{{name}}"{{#isOAuth}}, scopes = [{{#scopes}}AuthorizationScope(scope = "{{scope}}", description = "{{description}}"){{^-last}}, {{/-last}}{{/scopes}}]{{/isOAuth}}){{^-last}}, {{/-last}}{{/authMethods}}]{{/hasAuthMethods}})
+  @ApiResponses(
+    value = [{{#responses}}ApiResponse(code = {{{code}}}, message = "{{{message}}}"{{#baseType}}, response = {{{.}}}::class{{/baseType}}{{#containerType}}, responseContainer = "{{{.}}}"{{/containerType}}){{^-last}},{{/-last}}{{/responses}}])
+    {{/swaggerAnnotations}}
+  @FunctionName("{{operationId}}")
+  fun {{operationId}}Function(
+    {{#removeEmptyLines}}{{#lambda.indented}}{{>methodParams}}{{/lambda.indented}}{{/removeEmptyLines}}
+  ): HttpResponseMessage {
+    {{#lambda.indented}}{{#removeEmptyLines}}{{>apiMethodBodyParameters}}{{/removeEmptyLines}}{{/lambda.indented}}
+    val response = super.{{operationId}}(request = request {{#vendorExtensions.x-azure-additional-properties}}, {{parameterName}} = {{parameterName}}{{/vendorExtensions.x-azure-additional-properties}}{{#allParams}}{{^isFormParam}}, {{paramName}} = {{paramName}}{{/isFormParam}}{{/allParams}})
+
+    val builder = request.createResponseBuilder(response.status).body(response.body)
+    response.headers.forEach { builder.header(it.key, it.value) }
+    return builder.build()
+  }
+{{/operation}}
+}
+{{/operations}}

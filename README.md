@@ -1,6 +1,6 @@
 <h1 align="center">OpenAPI Generator</h1>
 
-
+KotlinAzureFunctionAppServerCodegen
 <div align="center">
 
 [![Stable releases in Maven Central](https://img.shields.io/maven-metadata/v/https/repo1.maven.org/maven2/org/openapitools/openapi-generator/maven-metadata.xml.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.openapitools%22%20AND%20a%3A%22openapi-generator%22)

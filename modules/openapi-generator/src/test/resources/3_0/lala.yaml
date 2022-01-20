@@ -1,0 +1,79 @@
+openapi: 3.0.0
+info:
+  title: projectplanning
+  version: '1.0'
+  description: Project-Planning API Specification
+  contact:
+    name: Holisticon
+    email: info@holisticon.de
+servers:
+  - url: 'http://localhost:8080/api'
+tags:
+  - name: consultant
+    description: Consultant
+  - name: custom-absence
+    description: Custom absence
+  - name: project
+    description: Project
+  - name: project-assignment
+    description: Project assignment
+  - name: team
+    description: Team
+  - name: zep-absence
+    description: ZEP absence
+  - name: zep-project-assignment
+    description: ZEP planning
+paths:
+  /consultants:
+    get:
+      summary: Get all consultants
+      operationId: get-consultants
+      description: Returns the list of all consultants
+      tags:
+        - consultant
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Consultant'
+      x-azure-additional-parameter:
+        - '@CosmosDBInput(name = "consultants", databaseName = "projectplanning-db", collectionName = "consultant", connectionStringSetting = "CosmosDBConnectionString")
+          consultants: Collection<Consultant>'
+        - name: 'consultants'
+          outputClass: 'de.holisticon.projectplanning.consultant.Consultant'
+components:
+  schemas:
+    Consultant:
+      title: Consultant
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+          nullable: true
+        zepUser:
+          type: string
+          nullable: true
+        teamId:
+          type: string
+        currentWeeklyCapacity:
+          type: number
+          format: double
+      required:
+        - id
+        - name
+        - email
+        - zepUser
+        - teamId
+        - currentWeeklyCapacity
+
+
+
+
