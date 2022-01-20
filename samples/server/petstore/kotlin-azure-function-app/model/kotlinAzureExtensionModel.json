@@ -1,0 +1,23 @@
+[
+  {
+    "path": "/consultants",
+    "method": "GET",
+    "extensions": [
+      {
+        "parameterName": "consultants",
+        "parameterType": "Collection<Consultant>",
+        "annotation": {
+          "annotationType": "CosmosDBInput",
+          "parameters": [
+            {
+              "databaseName": "\"projectplanning-db\""
+            },
+            {
+              "name": "\"consultants\""
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

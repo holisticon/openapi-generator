@@ -1,0 +1,70 @@
+package org.openapitools.codegen.kotlin;
+
+import static org.openapitools.codegen.languages.KotlinAzureFunctionAppServerCodegen.EXTENSION_MODEL_PROPERTY_KEY;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import java.io.File;
+
+import org.openapitools.codegen.ClientOptInput;
+import org.openapitools.codegen.CodegenConstants;
+import org.openapitools.codegen.DefaultGenerator;
+import org.openapitools.codegen.TestUtils;
+import org.openapitools.codegen.languages.KotlinAzureFunctionAppServerCodegen;
+import org.testng.annotations.Test;
+
+public class KotlinAzureFunctionAppGenTest {
+
+  private String extensionModelInputFile;
+
+  @Test(description = "test embedded enum array")
+  public void embeddedEnumArrayTest() throws Exception {
+    // paths
+    String testProject = "../../samples/server/petstore/kotlin-azure-function-app/";
+    extensionModelInputFile = new File(testProject + "model/kotlinAzureExtensionModel.yaml").getPath();
+    OpenAPI openAPI =
+      TestUtils.parseFlattenSpec(this.getClass().getResource("/3_0/petstore.yaml").getPath());
+    File output = new File(testProject + "target/generated-sources/openapi/");
+
+    KotlinAzureFunctionAppServerCodegen codegen = new KotlinAzureFunctionAppServerCodegen();
+    codegen.setOutputDir(output.getAbsolutePath());
+    String projectId = "org.openapitools.";
+    codegen.setApiPackage(projectId + "api");
+    codegen.setModelPackage(projectId + "api.model");
+    codegen.additionalProperties().put(CodegenConstants.SOURCE_FOLDER, "src/gen/kotlin");
+
+//    codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, baseModelPackage + ".yyyy.model.xxxx");
+    codegen.additionalProperties().put(EXTENSION_MODEL_PROPERTY_KEY, extensionModelInputFile);
+
+
+
+
+
+    ClientOptInput input = new ClientOptInput();
+    input.openAPI(openAPI);
+    input.config(codegen);
+    DefaultGenerator generator = new DefaultGenerator();
+    generator.opts(input).generate();
+
+  }
+
+  private void generatedExtensionModel(){
+//    ObjectMapper om = new ObjectMapper();
+//    TypeReference<List<OperationExtension>> tf = new TypeReference<List<OperationExtension>>() {};
+//    Map<String, String> m = new HashMap<>();
+//    m.put("name", "\"consultants\"");
+//    m.put("databaseName", "\"projectplanning-db\"");
+//    List<Car> cars = new ArrayList<>();
+//    CarPart cp = new CarPart("consultants", "Collection<Consultant>",
+//      new CarAnnotation("CosmosDBInput", m));
+//    List<CarPart> ext = new ArrayList<>();
+//    ext.add(cp);
+//    Car c = new Car("/consultants", HttpMethod.GET, ext);
+//
+//    cars.add(c);
+//    om.writeValue(new File(lalaInputFile), cars);
+  }
+
+  //no exception
+//    ClassLoader cl = KotlinTestUtils.buildModule(Collections.singletonList(outputModel.getAbsolutePath()),
+//      Thread.currentThread().getContextClassLoader());
+}

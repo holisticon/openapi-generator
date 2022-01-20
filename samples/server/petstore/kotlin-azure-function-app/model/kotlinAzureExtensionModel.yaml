@@ -1,0 +1,77 @@
+- path: /user
+  method: post
+  extensions:
+    - parameterName: users
+      parameterType: Collection<User>
+      annotation:
+        type: CosmosDBOutput
+        parameters:
+          name: 'user'
+          databaseName: "petstore"
+          collectionName: "user"
+          connectionStringSetting: "CosmosDBConnectionString"
+
+- path: /user/createWithArray
+  method: post
+  extensions:
+    - parameterName: users
+      parameterType: Collection<User>
+      annotation:
+        type: CosmosDBOutput
+        parameters:
+          name: 'user'
+          databaseName: "petstore"
+          collectionName: "user"
+          connectionStringSetting: "CosmosDBConnectionString"
+
+- path: /user/createWithList
+  method: post
+  extensions:
+    - parameterName: users
+      parameterType: Collection<User>
+      annotation:
+        type: CosmosDBOutput
+        parameters:
+          name: 'user'
+          databaseName: "petstore"
+          collectionName: "user"
+          connectionStringSetting: "CosmosDBConnectionString"
+
+- path: /pet
+  method: post
+  extensions:
+    - parameterName: petRepository
+      parameterType: OutputBinding<Pet>
+      annotation:
+        type: CosmosDBOutput
+        parameters:
+          name: 'petRepository'
+          databaseName: "petstore"
+          collectionName: "pet"
+          connectionStringSetting: "CosmosDBConnectionString"
+
+- path: /pet
+  method: post
+  extensions:
+    - parameterName: petRepository
+      parameterType: OutputBinding<Pet>
+      annotation:
+        type: CosmosDBOutput
+        parameters:
+          name: 'petRepository'
+          databaseName: "petstore"
+          collectionName: "pet"
+          connectionStringSetting: "CosmosDBConnectionString"
+
+- path: /pet/{petId}
+  method: get
+  extensions:
+    - parameterName: petRepository
+      parameterType: java.util.Optional<Pet>
+      annotation:
+        type: CosmosDBInput
+        parameters:
+          name: 'petRepository'
+          databaseName: "petstore"
+          collectionName: "pet"
+          connectionStringSetting: "CosmosDBConnectionString"
