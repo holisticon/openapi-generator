@@ -32,11 +32,6 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
 
   private final Logger logger = LoggerFactory.getLogger(KotlinAzureFunctionAppServerCodegen.class);
   public static final String INTERFACE_TEMPLATE_NAME = "apiInterface.mustache";
-  public final Mustache.Lambda upperFirstLetter = (fragment, writer) -> {
-    String res = fragment.execute();
-    writer.write(String.valueOf(res.charAt(0)).toUpperCase(Locale.ROOT) + res.substring(1));
-  };
-
 
 
   public CodegenType getTag() {
@@ -178,7 +173,6 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
     embeddedTemplateDir = templateDir = "kotlin-azure-function-app";
     apiPackage = "apis";
     modelPackage = "models";
-    supportingFiles.add(new SupportingFile("README.mustache", "", "README.md"));
     apiSuffix = "AzureFunction";
 
     cliOptions.add(new CliOption(EXTENSION_MODEL_PROPERTY_KEY, "path to file with azure functions extensions"));

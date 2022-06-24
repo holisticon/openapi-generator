@@ -46,25 +46,4 @@ public class KotlinAzureFunctionAppGenTest {
     generator.opts(input).generate();
 
   }
-
-  private void generatedExtensionModel(){
-//    ObjectMapper om = new ObjectMapper();
-//    TypeReference<List<OperationExtension>> tf = new TypeReference<List<OperationExtension>>() {};
-//    Map<String, String> m = new HashMap<>();
-//    m.put("name", "\"consultants\"");
-//    m.put("databaseName", "\"projectplanning-db\"");
-//    List<Car> cars = new ArrayList<>();
-//    CarPart cp = new CarPart("consultants", "Collection<Consultant>",
-//      new CarAnnotation("CosmosDBInput", m));
-//    List<CarPart> ext = new ArrayList<>();
-//    ext.add(cp);
-//    Car c = new Car("/consultants", HttpMethod.GET, ext);
-//
-//    cars.add(c);
-//    om.writeValue(new File(lalaInputFile), cars);
-  }
-
-  //no exception
-//    ClassLoader cl = KotlinTestUtils.buildModule(Collections.singletonList(outputModel.getAbsolutePath()),
-//      Thread.currentThread().getContextClassLoader());
 }

@@ -2,15 +2,6 @@ package {{package}}
 
 {{#imports}}import {{import}}
 {{/imports}}
-{{#swaggerAnnotations}}
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.ApiParam
-import io.swagger.annotations.ApiResponse
-import io.swagger.annotations.ApiResponses
-import io.swagger.annotations.Authorization
-import io.swagger.annotations.AuthorizationScope
-{{/swaggerAnnotations}}
 
 import kotlin.collections.List
 import kotlin.collections.Map
@@ -23,24 +14,10 @@ import com.microsoft.azure.functions.annotation.*
 import javax.naming.Binding;
 
 
-{{#swaggerAnnotations}}
-@Api(value = "{{{baseName}}}", description = "The {{{baseName}}} API")
-{{/swaggerAnnotations}}
 {{#operations}}
 class {{classname}}: {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api() {
 {{#operation}}
 
-  {{#swaggerAnnotations}}
-  @ApiOperation(
-    value = "{{{summary}}}",
-    nickname = "{{{operationId}}}",
-    notes = "{{{notes}}}"{{#returnBaseType}},
-    response = {{{.}}}::class{{/returnBaseType}}{{#returnContainer}},
-    responseContainer = "{{{.}}}"{{/returnContainer}}{{#hasAuthMethods}},
-    authorizations = [{{#authMethods}}Authorization(value = "{{name}}"{{#isOAuth}}, scopes = [{{#scopes}}AuthorizationScope(scope = "{{scope}}", description = "{{description}}"){{^-last}}, {{/-last}}{{/scopes}}]{{/isOAuth}}){{^-last}}, {{/-last}}{{/authMethods}}]{{/hasAuthMethods}})
-  @ApiResponses(
-    value = [{{#responses}}ApiResponse(code = {{{code}}}, message = "{{{message}}}"{{#baseType}}, response = {{{.}}}::class{{/baseType}}{{#containerType}}, responseContainer = "{{{.}}}"{{/containerType}}){{^-last}},{{/-last}}{{/responses}}])
-    {{/swaggerAnnotations}}
   @FunctionName("{{operationId}}")
   fun {{operationId}}Function(
     {{#removeEmptyLines}}{{#lambda.indented}}{{>methodParams}}{{/lambda.indented}}{{/removeEmptyLines}}
