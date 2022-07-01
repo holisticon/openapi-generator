@@ -64,7 +64,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
     final Mustache.Lambda formatPath =
       (fragment, writer) -> writer.write(fragment.execute().replaceFirst("^/", ""));
     final Mustache.Lambda removeEmptyLines =
-      (fragment, writer) -> writer.write(fragment.execute().replaceAll("(?m)^[ \t]*\r?\n", ""));
+      (fragment, writer) -> writer.write(fragment.execute().replaceAll("(?m)^[ \t]*\r?\n+", "\n"));
 
 
     additionalProperties.put("removeApiSuffix", removeApiSuffix);

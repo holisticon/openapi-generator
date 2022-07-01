@@ -17,6 +17,18 @@ import javax.naming.Binding;
 {{#operations}}
 class {{classname}}: {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api() {
 {{#operation}}
+  {{#allParams}}
+    {{#isEnum}}
+      enum class {{enumName}}_{{operationId}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) {
+        {{#allowableValues}}
+          {{#enumVars}}
+              {{&name}}({{{value}}}){{^-last}},{{/-last}}
+          {{/enumVars}}
+        {{/allowableValues}}
+      }
+
+    {{/isEnum}}
+  {{/allParams}}
 
   @FunctionName("{{operationId}}")
   fun {{operationId}}Function(
