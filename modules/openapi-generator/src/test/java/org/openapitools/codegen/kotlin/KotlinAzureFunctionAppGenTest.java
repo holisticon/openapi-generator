@@ -1,5 +1,6 @@
 package org.openapitools.codegen.kotlin;
 
+import static org.openapitools.codegen.CodegenConstants.ENUM_PROPERTY_NAMING_TYPE.UPPERCASE;
 import static org.openapitools.codegen.languages.KotlinAzureFunctionAppServerCodegen.EXTENSION_MODEL_PROPERTY_KEY;
 
 import io.swagger.v3.oas.models.OpenAPI;
@@ -26,6 +27,7 @@ public class KotlinAzureFunctionAppGenTest {
     File output = new File(testProject + "target/generated-sources/openapi/");
 
     KotlinAzureFunctionAppServerCodegen codegen = new KotlinAzureFunctionAppServerCodegen();
+    codegen.setEnumPropertyNaming(UPPERCASE.name());
     codegen.setOutputDir(output.getAbsolutePath());
     String projectId = "org.openapitools.";
     codegen.setApiPackage(projectId + "api");
