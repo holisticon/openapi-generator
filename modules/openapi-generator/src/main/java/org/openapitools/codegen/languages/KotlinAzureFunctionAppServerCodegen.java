@@ -18,6 +18,7 @@ import org.openapitools.codegen.*;
 import java.io.File;
 import java.util.*;
 
+import org.openapitools.codegen.meta.features.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,6 +166,30 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
 
   public KotlinAzureFunctionAppServerCodegen() {
     super();
+
+    modifyFeatureSet(features -> features
+      .excludeSecurityFeatures(
+        SecurityFeature.BasicAuth,
+        SecurityFeature.ApiKey,
+        SecurityFeature.OpenIDConnect,
+        SecurityFeature.BearerToken,
+        SecurityFeature.OAuth2_Implicit,
+        SecurityFeature.OAuth2_Password,
+        SecurityFeature.OAuth2_ClientCredentials,
+        SecurityFeature.OAuth2_AuthorizationCode
+      )
+      .excludeGlobalFeatures(
+        GlobalFeature.XMLStructureDefinitions,
+        GlobalFeature.Callbacks,
+        GlobalFeature.LinkObjects,
+        GlobalFeature.ParameterStyling
+      )
+      .excludeParameterFeatures(
+        ParameterFeature.Cookie,
+        ParameterFeature.FormUnencoded,
+        ParameterFeature.FormMultipart
+      )
+    );
 
     outputFolder = "generated-code" + File.separator + "kotlin-azure-function-app";
     modelTemplateFiles.put("model.mustache", ".kt");
