@@ -12,10 +12,7 @@ val {{paramName}} = request.queryParameters["{{paramName}}"]{{#isArray}}?.split(
 val notSetRequiredParams = mutableSetOf<String>()
 
 {{#allParams}}
-{{^defaultValue}}{{#required}}
-if({{paramName}} == null) {
-  notSetRequiredParams.add("{{paramName}}")
-}
+{{^defaultValue}}{{#required}}{{paramName}} ?: run{ notSetRequiredParams.add("{{paramName}}") }
 {{/required}}{{/defaultValue}}
 {{/allParams}}
 
