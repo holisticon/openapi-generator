@@ -8,6 +8,9 @@ import java.io.Serializable
  * @param {{name}} {{{description}}}
 {{/vars}}
  */
+{{#isDeprecated}}
+@Deprecated(message = "This data class is deprecated.")
+{{/isDeprecated}}
 data class {{classname}}(
 {{#requiredVars}}
 {{>data_class_req_var}}{{^-last}},
