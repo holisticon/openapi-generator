@@ -19,6 +19,9 @@ class {{classname}}: {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api() 
 {{#operation}}
   {{#allParams}}
     {{#isEnum}}
+      {{#isDeprecated}}
+      @Deprecated(message = "This enum is deprecated.")
+      {{/isDeprecated}}
       enum class {{enumName}}_{{operationId}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) {
         {{#allowableValues}}
           {{#enumVars}}
@@ -31,6 +34,9 @@ class {{classname}}: {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api() 
   {{/allParams}}
 
   @FunctionName("{{operationId}}")
+  {{#isDeprecated}}
+  @Deprecated(message = "This function is deprecated.")
+  {{/isDeprecated}}
   fun {{operationId}}Function(
     {{#removeEmptyLines}}{{#lambda.indented}}{{>methodParams}}{{/lambda.indented}}{{/removeEmptyLines}}
   ): HttpResponseMessage {
