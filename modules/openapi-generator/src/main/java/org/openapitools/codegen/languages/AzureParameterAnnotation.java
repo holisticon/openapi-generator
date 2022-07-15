@@ -13,4 +13,12 @@ public class AzureParameterAnnotation {
     this.type = type;
     this.parameters = parameters;
   }
+
+  @Override
+  public String toString() {
+    return "AzureParameterAnnotation{" +
+      "type='" + type + '\'' +
+      ", parameters=" + parameters +
+      '}';
+  }
 }

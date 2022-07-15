@@ -24,13 +24,23 @@ interface {{classname}}Interface {
   data class {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result private constructor(
     val status: HttpStatusType,
     val headers: Map<String, String>,
-    val body: Any? = null
+    val body: Any? = null,
+    val contentType: String? = null
   ) {
     companion object {
     {{#responses}}
-      fun respond{{^isDefault}}{{code}}{{/isDefault}}({{#isDefault}}status: HttpStatusType, {{/isDefault}}{{#dataType}}result: {{dataType}}, {{/dataType}}headers: Map<String, String> = mapOf()): {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result {
-        return {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result({{#isDefault}}status{{/isDefault}}{{^isDefault}}HttpStatusType.custom({{code}}){{/isDefault}}, headers{{#dataType}}, result{{/dataType}});
+      {{#content}}
+        {{# ContentTypeMap }}
+      fun respond{{^isDefault}}{{code}}{{/isDefault}}{{^isUnique}}{{contentTypeShortName}}{{/isUnique}}({{#isDefault}}status: HttpStatusType, {{/isDefault}}{{#dataType}}result: {{dataType}}, {{/dataType}}headers: Map<String, String> = mapOf()): {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result {
+        return {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result({{#isDefault}}status{{/isDefault}}{{^isDefault}}status = HttpStatusType.custom({{code}}){{/isDefault}}, headers = headers{{#dataType}}, body = result{{/dataType}}{{#hasContentType}}, contentType = "{{key}}"{{/hasContentType}});
       }
+        {{/ContentTypeMap}}
+      {{/content}}
+      {{^content}}
+      fun respond{{^isDefault}}{{code}}{{/isDefault}}({{#isDefault}}status: HttpStatusType, {{/isDefault}}headers: Map<String, String> = mapOf()): {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result {
+        return {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result({{#isDefault}}status{{/isDefault}}{{^isDefault}}status = HttpStatusType.custom({{code}}){{/isDefault}}, headers = headers);
+      }
+      {{/content}}
    {{/responses}}
     }
   }

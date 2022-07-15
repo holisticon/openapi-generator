@@ -46,19 +46,7 @@
         type: CosmosDBOutput
         parameters:
           name: 'petRepository'
-          databaseName: "petstore"
-          collectionName: "pet"
-          connectionStringSetting: "CosmosDBConnectionString"
-
-- path: /pet
-  method: post
-  extensions:
-    - parameterName: petRepository
-      parameterType: OutputBinding<Pet>
-      annotation:
-        type: CosmosDBOutput
-        parameters:
-          name: 'petRepository'
+          createIfNotExists: true
           databaseName: "petstore"
           collectionName: "pet"
           connectionStringSetting: "CosmosDBConnectionString"
@@ -75,3 +63,29 @@
           databaseName: "petstore"
           collectionName: "pet"
           connectionStringSetting: "CosmosDBConnectionString"
+
+- path: /pet/findByStatus
+  method: get
+  extensions:
+    - parameterName: petRepository
+      parameterType: List<Pet>
+      annotation:
+        type: CosmosDBInput
+        parameters:
+          name: 'petRepository'
+          databaseName: "petstore"
+          collectionName: "pet"
+          connectionStringSetting: "CosmosDBConnectionString"
+
+#- path: /pet
+#  method: put
+#  extensions:
+#    - parameterName: petRepository
+#      parameterType: java.util.List<Pet>
+#      annotation:
+#        type: CosmosDBInput
+#        parameters:
+#          name: 'petRepository'
+#          databaseName: "petstore"
+#          collectionName: "pet"
+#          connectionStringSetting: "CosmosDBConnectionString"
