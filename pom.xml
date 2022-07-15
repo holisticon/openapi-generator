@@ -1292,16 +1292,16 @@
                 <!--<module>samples/server/petstore/erlang-server</module>-->
             </modules>
         </profile>
-      <profile>
-        <id>azure</id>
-        <activation>
-          <activeByDefault>true</activeByDefault>
-        </activation>
-        <modules>
-          <!-- servers -->
-          <module>samples/server/petstore/kotlin-azure-function-app</module>
-        </modules>
-      </profile>
+        <profile>
+            <id>azure</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <!-- servers -->
+                <module>samples/server/petstore/kotlin-azure-function-app</module>
+            </modules>
+        </profile>
         <!-- test with JDK11 in drone.io -->
         <profile>
             <id>samples.droneio</id>

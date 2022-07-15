@@ -4,15 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.samskivert.mustache.Mustache;
-import com.samskivert.mustache.Template;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
-import java.io.IOException;
-import java.io.Writer;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.text.CaseUtils;
 import org.openapitools.codegen.*;
 
 import java.io.File;
@@ -66,11 +64,51 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
     final Mustache.Lambda removeEmptyLines =
       (fragment, writer) -> writer.write(fragment.execute().replaceAll("(?m)^[ \t]*\r?\n+", "\n"));
 
+    class ContentTypeMapContext {
+      public String key;
+      public Object value;
+
+      public Integer size;
+
+      public ContentTypeMapContext(String key, Object value, Integer size) {
+        this.key = key;
+        this.value = value;
+        this.size = size;
+      }
+
+      public boolean hasContentType() {
+        return null != key;
+      }
+      public boolean isUnique() {
+        return size <=1;
+      }
+
+      public String contentTypeShortName() {
+        int shortNameIndex = key.lastIndexOf("/");
+        String shortName = key.substring(shortNameIndex+1);
+        return CaseUtils.toCamelCase(shortName, true, '-','_');
+      }
+    }
+    final Mustache.Lambda contentTypeMap =
+      (fragment, writer) -> {
+        if(fragment.context() instanceof Map){
+          Map<?,?> map = (Map<?,?>) fragment.context();
+          map.forEach((key, value) ->
+            fragment.execute(new ContentTypeMapContext(key.toString(), value, map.size()), writer));
+          if(map.entrySet().isEmpty()) {
+            fragment.execute(new ContentTypeMapContext(null,null, 0), writer);
+          }
+        } else {
+          throw new IllegalStateException("Wrong usage of custom lambda ContentTypeMap");
+        }
+      };
+
 
     additionalProperties.put("removeApiSuffix", removeApiSuffix);
     additionalProperties.put("formatPath", formatPath);
     additionalProperties.put("upperFirstLetter", upperFirstLetter);
     additionalProperties.put("removeEmptyLines", removeEmptyLines);
+    additionalProperties.put("ContentTypeMap", contentTypeMap);
   }
 
   private void processExtensionModel() {

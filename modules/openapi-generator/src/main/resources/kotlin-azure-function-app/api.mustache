@@ -44,6 +44,9 @@ class {{classname}}: {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api() 
     val response = super.{{operationId}}(request = request {{#vendorExtensions.x-azure-additional-properties}}, {{parameterName}} = {{parameterName}}{{/vendorExtensions.x-azure-additional-properties}}{{#allParams}}{{^isFormParam}}, {{paramName}} = {{paramName}}{{^defaultValue}}{{#required}}!!{{/required}}{{/defaultValue}}{{/isFormParam}}{{/allParams}})
 
     val builder = request.createResponseBuilder(response.status).body(response.body)
+    if(response.contentType != null){
+      builder.header("Content-Type",response.contentType)
+    }
     response.headers.forEach { builder.header(it.key, it.value) }
     return builder.build()
   }

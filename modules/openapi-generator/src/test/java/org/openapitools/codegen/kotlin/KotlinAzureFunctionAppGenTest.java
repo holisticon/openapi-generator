@@ -23,7 +23,7 @@ public class KotlinAzureFunctionAppGenTest {
     String testProject = "../../samples/server/petstore/kotlin-azure-function-app/";
     extensionModelInputFile = new File(testProject + "model/kotlinAzureExtensionModel.yaml").getPath();
     OpenAPI openAPI =
-      TestUtils.parseFlattenSpec(this.getClass().getResource("/3_0/petstore.yaml").getPath());
+      TestUtils.parseFlattenSpec(this.getClass().getResource("/3_0/petstore-id-as-string.yaml").getPath());
     File output = new File(testProject + "target/generated-sources/openapi/");
 
     KotlinAzureFunctionAppServerCodegen codegen = new KotlinAzureFunctionAppServerCodegen();

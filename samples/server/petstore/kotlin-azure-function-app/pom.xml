@@ -11,14 +11,20 @@
     <name>Azure Functions OpenAPI Petstore</name>
 
     <properties>
+        <functionAppName>Petstore Azure Functions App</functionAppName>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <java.version>8</java.version>
-        <kotlin.version>1.6.0</kotlin.version>
-        <azure.functions.maven.plugin.version>1.14.0</azure.functions.maven.plugin.version>
-        <azure.functions.java.library.version>1.4.2</azure.functions.java.library.version>
-        <functionAppName>Petstore Azure Functions App</functionAppName>
+
+        <kotlin.version>1.7.0</kotlin.version>
+        <azure.functions.maven.plugin.version>1.19.0</azure.functions.maven.plugin.version>
+        <azure.functions.java.library.version>2.0.1</azure.functions.java.library.version>
+        <kotest.version>5.3.2</kotest.version>
+        <junit.version>5.8.2</junit.version>
+        <okhttp.version>4.10.0</okhttp.version>
+        <moshi.version>1.13.0</moshi.version>
     </properties>
 
     <dependencies>
@@ -37,14 +43,31 @@
         <dependency>
             <groupId>com.squareup.moshi</groupId>
             <artifactId>moshi</artifactId>
-            <version>1.13.0</version>
+            <version>${moshi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.squareup.moshi/moshi-kotlin -->
+        <dependency>
+            <groupId>com.squareup.moshi</groupId>
+            <artifactId>moshi-kotlin</artifactId>
+            <version>${moshi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.microutils</groupId>
+            <artifactId>kotlin-logging-jvm</artifactId>
+            <version>2.1.21</version>
         </dependency>
 
         <!-- Test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.1</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -60,20 +83,72 @@
             <groupId>org.openapitools</groupId>
             <artifactId>openapi-generator-maven-plugin</artifactId>
             <!-- RELEASE_VERSION -->
-            <version>5.3.1-SNAPSHOT</version>
+            <version>6.0.1-SNAPSHOT</version>
             <!-- /RELEASE_VERSION -->
+        </dependency>
+
+<!--        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-cosmos</artifactId>
+            <version>4.0.0-preview.1</version>
+        </dependency>-->
+
+        <!-- kotest -->
+        <dependency>
+            <groupId>io.kotest</groupId>  <!--needed?-->
+            <artifactId>kotest-runner-junit5</artifactId>
+            <version>${kotest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.kotest</groupId>
+            <artifactId>kotest-runner-junit5-jvm</artifactId>
+            <version>${kotest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.kotest</groupId>
+            <artifactId>kotest-assertions-core</artifactId>
+            <version>${kotest.version}</version>
+            <scope>test</scope>
+        </dependency>
+<!--        <dependency>
+            <groupId>io.kotest</groupId>
+            <artifactId>kotest-property-jvm</artifactId>
+            <version>${kotest.version}</version>
+            <scope>test</scope>
+        </dependency>-->
+
+
+
+
+
+
+        <!-- jUnit -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <!--<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>-->
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>add</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>add-source</goal>
@@ -84,6 +159,18 @@
                             </sources>
                         </configuration>
                     </execution>
+
+   <!--                 <execution>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-test-sources/openapiclient</source>
+                            </sources>
+                        </configuration>
+                    </execution>-->
                 </executions>
             </plugin>
 
@@ -92,23 +179,22 @@
                 <artifactId>openapi-generator-maven-plugin</artifactId>
 
                 <!-- RELEASE_VERSION -->
-                <version>5.3.1-SNAPSHOT</version>
+                <version>6.0.1-SNAPSHOT</version>
                 <!-- /RELEASE_VERSION -->
                 <executions>
                     <execution>
                         <id>generate-backend-api-code</id>
                         <goals>
-                            <goal>generate</goal>
+                           <!-- <goal>generate</goal>-->
+                            <!--TODO enable me-->
                         </goals>
                         <configuration>
-                            <inputSpec>modules/openapi-generator/src/test/resources/3_0/petstore.yaml</inputSpec>
+                            <inputSpec>modules/openapi-generator/src/test/resources/3_0/petstore-id-as-string.yaml</inputSpec>
                             <generatorName>kotlin-azure-function-app</generatorName>
-                            <!--<library>spring-boot</library>-->
                             <apiPackage>${project.groupId}.api</apiPackage>
                             <modelPackage>${project.groupId}.api.model</modelPackage>
-                            <!--<additionalProperties>lala=${project.basedir}/src/main/resources/config.yaml</additionalProperties>-->
                             <configOptions>
-                             <!--<lala>${project.basedir}/src/main/resources/config.yaml</lala>-->
+                                <!--<packageName>azureserver</packageName>-->
                                 <sourceFolder>src/gen/kotlin</sourceFolder>
                                 <delegatePattern>true</delegatePattern>
                                 <enumPropertyNaming>UPPERCASE</enumPropertyNaming>
@@ -118,6 +204,35 @@
                                 <azureExtensionsFile>samples/server/petstore/kotlin-azure-function-app/model/kotlinAzureExtensionModel.yaml</azureExtensionsFile>
                             </configOptions>
                            <!-- <modelNameSuffix>Dto</modelNameSuffix>-->
+                            <typeMappings>
+                                <typeMapping>Integer=lang.Long</typeMapping>
+                            </typeMappings>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-test-api-code</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <phase>generate-test-sources</phase>
+                        <configuration>
+                            <inputSpec>modules/openapi-generator/src/test/resources/3_0/petstore-id-as-string.yaml</inputSpec>
+                            <generatorName>kotlin</generatorName>
+                            <library>jvm-okhttp4</library>
+
+                            <apiPackage>${project.groupId}.okhttpclient.api</apiPackage>
+                            <modelPackage>${project.groupId}.okhttpclient.model</modelPackage>
+                            <output>${project.build.directory}/generated-test-sources/openapiclient</output>
+                            <configOptions>
+                                <!--<packageName>okhttpclient</packageName>-->
+                                <library>jvm-okhttp4</library>
+                                <sourceFolder>src/gen/kotlin</sourceFolder>
+                                <delegatePattern>true</delegatePattern>
+                                <enumPropertyNaming>UPPERCASE</enumPropertyNaming>
+                                <openApiNullable>false</openApiNullable>
+                                <useTags>true</useTags>
+                                <useCoroutines>true</useCoroutines>
+                            </configOptions>
                             <typeMappings>
                                 <typeMapping>Integer=lang.Long</typeMapping>
                             </typeMappings>
@@ -192,6 +307,11 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+<!--                <version>${surefirePlugin.version}</version>-->
             </plugin>
 
             <!--Remove obj folder generated by .NET SDK in maven clean-->

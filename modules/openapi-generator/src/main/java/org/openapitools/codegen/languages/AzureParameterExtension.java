@@ -15,4 +15,13 @@ public class AzureParameterExtension {
     this.parameterType = parameterType;
     this.annotation = annotation;
   }
+
+  @Override
+  public String toString() {
+    return "AzureParameterExtension{" +
+      "parameterName='" + parameterName + '\'' +
+      ", parameterType='" + parameterType + '\'' +
+      ", annotation=" + annotation +
+      '}';
+  }
 }
