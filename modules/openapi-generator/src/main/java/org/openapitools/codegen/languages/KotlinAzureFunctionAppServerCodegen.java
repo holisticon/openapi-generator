@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
 
-
   protected Optional<String> azureExtensionsFile = Optional.empty();
   public static final String EXTENSION_MODEL_PROPERTY_KEY = "azureExtensionsFile";
 
@@ -31,6 +30,52 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
 
   private final Logger logger = LoggerFactory.getLogger(KotlinAzureFunctionAppServerCodegen.class);
   public static final String INTERFACE_TEMPLATE_NAME = "apiInterface.mustache";
+
+  public KotlinAzureFunctionAppServerCodegen() {
+    super();
+    // currently json deserialization of azure functions is strict about the enum name.
+    CodegenConstants.ENUM_PROPERTY_NAMING_TYPE defaultEnumNaming = CodegenConstants.ENUM_PROPERTY_NAMING_TYPE.original;
+    cliOptions.stream().filter( x ->  CodegenConstants.ENUM_PROPERTY_NAMING.equals(x.getOpt())).findFirst().map( p -> p.defaultValue(
+      defaultEnumNaming.name()
+    ));
+    super.setEnumPropertyNaming(defaultEnumNaming.name());
+
+    modifyFeatureSet(features -> features
+      .excludeSecurityFeatures(
+        SecurityFeature.BasicAuth,
+        SecurityFeature.ApiKey,
+        SecurityFeature.OpenIDConnect,
+        SecurityFeature.BearerToken,
+        SecurityFeature.OAuth2_Implicit,
+        SecurityFeature.OAuth2_Password,
+        SecurityFeature.OAuth2_ClientCredentials,
+        SecurityFeature.OAuth2_AuthorizationCode
+      )
+      .excludeGlobalFeatures(
+        GlobalFeature.XMLStructureDefinitions,
+        GlobalFeature.Callbacks,
+        GlobalFeature.LinkObjects,
+        GlobalFeature.ParameterStyling
+      )
+      .excludeParameterFeatures(
+        ParameterFeature.Cookie,
+        ParameterFeature.FormUnencoded,
+        ParameterFeature.FormMultipart
+      )
+    );
+
+    outputFolder = "generated-code" + File.separator + "kotlin-azure-function-app";
+    modelTemplateFiles.put("model.mustache", ".kt");
+    apiTemplateFiles.put("api.mustache", ".kt");
+    apiTemplateFiles.put(INTERFACE_TEMPLATE_NAME, ".kt");
+    embeddedTemplateDir = templateDir = "kotlin-azure-function-app";
+    apiPackage = "apis";
+    modelPackage = "models";
+    apiSuffix = "AzureFunction";
+
+    cliOptions.add(new CliOption(EXTENSION_MODEL_PROPERTY_KEY, "path to file with azure functions extensions"));
+
+  }
 
 
   public CodegenType getTag() {
@@ -44,6 +89,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
   public String getHelp() {
     return "Generates a kotlin-azure-function-app server.";
   }
+
 
   @Override
   public void processOpts() {
@@ -65,10 +111,10 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
       (fragment, writer) -> writer.write(fragment.execute().replaceAll("(?m)^[ \t]*\r?\n+", "\n"));
 
     class ContentTypeMapContext {
-      public String key;
-      public Object value;
+      public final String key;
+      public final Object value;
 
-      public Integer size;
+      public final Integer size;
 
       public ContentTypeMapContext(String key, Object value, Integer size) {
         this.key = key;
@@ -200,46 +246,6 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         op.addExtension(AZURE_EXTENSIONS_KEY, cp);
       }
     }
-  }
-
-  public KotlinAzureFunctionAppServerCodegen() {
-    super();
-
-    modifyFeatureSet(features -> features
-      .excludeSecurityFeatures(
-        SecurityFeature.BasicAuth,
-        SecurityFeature.ApiKey,
-        SecurityFeature.OpenIDConnect,
-        SecurityFeature.BearerToken,
-        SecurityFeature.OAuth2_Implicit,
-        SecurityFeature.OAuth2_Password,
-        SecurityFeature.OAuth2_ClientCredentials,
-        SecurityFeature.OAuth2_AuthorizationCode
-      )
-      .excludeGlobalFeatures(
-        GlobalFeature.XMLStructureDefinitions,
-        GlobalFeature.Callbacks,
-        GlobalFeature.LinkObjects,
-        GlobalFeature.ParameterStyling
-      )
-      .excludeParameterFeatures(
-        ParameterFeature.Cookie,
-        ParameterFeature.FormUnencoded,
-        ParameterFeature.FormMultipart
-      )
-    );
-
-    outputFolder = "generated-code" + File.separator + "kotlin-azure-function-app";
-    modelTemplateFiles.put("model.mustache", ".kt");
-    apiTemplateFiles.put("api.mustache", ".kt");
-    apiTemplateFiles.put(INTERFACE_TEMPLATE_NAME, ".kt");
-    embeddedTemplateDir = templateDir = "kotlin-azure-function-app";
-    apiPackage = "apis";
-    modelPackage = "models";
-    apiSuffix = "AzureFunction";
-
-    cliOptions.add(new CliOption(EXTENSION_MODEL_PROPERTY_KEY, "path to file with azure functions extensions"));
-
   }
 
   @Override

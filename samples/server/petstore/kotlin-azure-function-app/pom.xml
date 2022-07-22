@@ -156,6 +156,8 @@
                         <configuration>
                             <sources>
                                 <source>${project.basedir}/src/gen/kotlin</source>
+                                <!-- can be removed when openapi-generator-maven-plugins generate is used -->
+                                <source>${project.basedir}/target/generated-sources/openapi/src/gen/kotlin</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -185,7 +187,7 @@
                     <execution>
                         <id>generate-backend-api-code</id>
                         <goals>
-                           <!-- <goal>generate</goal>-->
+                            <!--<goal>generate</goal>-->
                             <!--TODO enable me-->
                         </goals>
                         <configuration>
@@ -197,7 +199,6 @@
                                 <!--<packageName>azureserver</packageName>-->
                                 <sourceFolder>src/gen/kotlin</sourceFolder>
                                 <delegatePattern>true</delegatePattern>
-                                <enumPropertyNaming>UPPERCASE</enumPropertyNaming>
                                 <openApiNullable>false</openApiNullable>
                                 <interfaceOnly>true</interfaceOnly>
                                 <useTags>true</useTags>
