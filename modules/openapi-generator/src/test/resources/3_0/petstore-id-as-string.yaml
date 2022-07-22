@@ -92,7 +92,7 @@ paths:
               type: string
               enum:
                 - available
-                - pending
+                - penDing
                 - sold
               default: available
       responses:
@@ -724,7 +724,7 @@ components:
           deprecated: true
           enum:
             - available
-            - pending
+            - peNding
             - sold
       xml:
         name: Pet
