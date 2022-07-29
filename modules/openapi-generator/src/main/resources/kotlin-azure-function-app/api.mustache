@@ -17,7 +17,7 @@ import javax.naming.Binding;
 {{#operations}}
 class {{classname}} {
 
-  val api = {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api()
+  val api: {{classname}}Interface = {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api()
 
 {{#operation}}
   {{#allParams}}
