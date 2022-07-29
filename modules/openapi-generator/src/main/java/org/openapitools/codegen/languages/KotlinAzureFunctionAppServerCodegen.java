@@ -3,6 +3,7 @@ package org.openapitools.codegen.languages;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.samskivert.mustache.Mustache;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
@@ -246,7 +247,9 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         continue;
       }
       for (AzureParameterExtension cp : c.extensions) {
-        op.addExtension(AZURE_EXTENSIONS_KEY, cp);
+        List<AzureParameterExtension> extensions = (List<AzureParameterExtension>) Optional.ofNullable(op.getExtensions()).orElse(Collections.emptyMap()).getOrDefault(AZURE_EXTENSIONS_KEY, Lists.newArrayList());
+        extensions.add(cp);
+        op.addExtension(AZURE_EXTENSIONS_KEY, extensions);
       }
     }
   }

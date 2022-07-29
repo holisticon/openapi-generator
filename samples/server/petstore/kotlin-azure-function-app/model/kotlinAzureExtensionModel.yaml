@@ -54,12 +54,23 @@
 - path: /pet/{petId}
   method: get
   extensions:
-    - parameterName: petRepository
+    - parameterName: petToUpdate
       parameterType: java.util.Optional<Pet>
       annotation:
         type: CosmosDBInput
         parameters:
           name: 'petRepository'
+          databaseName: "petstore"
+          collectionName: "pet"
+          connectionStringSetting: "CosmosDBConnectionString"
+          id: '{id}'
+    - parameterName: updatedPet
+      parameterType: OutputBinding<Pet>
+      annotation:
+        type: CosmosDBOutput
+        parameters:
+          name: 'petRepository'
+          createIfNotExists: true
           databaseName: "petstore"
           collectionName: "pet"
           connectionStringSetting: "CosmosDBConnectionString"

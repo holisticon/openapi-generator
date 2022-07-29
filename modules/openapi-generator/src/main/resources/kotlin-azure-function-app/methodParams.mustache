@@ -1,5 +1,6 @@
 @HttpTrigger(name = "req", methods = [HttpMethod.{{httpMethod}}], authLevel = AuthorizationLevel.FUNCTION, route = "{{#formatPath}}{{path}}{{/formatPath}}")
 request: HttpRequestMessage<{{#bodyParam}}{{dataType}}{{/bodyParam}}{{^bodyParam}}{{^formParams.isEmpty}}String{{/formParams.isEmpty}}{{^ formParams }}Void{{/ formParams }}{{/bodyParam}}>,
 {{#pathParams}}@BindingName("{{paramName}}") {{paramName}}: {{dataType}}{{^defaultValue}}?{{/defaultValue}}{{#defaultValue}} = {{defaultValue}}{{/defaultValue}}, {{/pathParams}}
-{{#vendorExtensions.x-azure-additional-properties}}{{#annotation}}@{{type}}({{#parameters.entrySet}}{{key}}={{{value}}}{{^-last}}, {{/-last}}{{/parameters.entrySet}}){{/annotation}}
-{{parameterName}}: {{{parameterType}}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-azure-additional-properties}}
+{{#vendorExtensions.x-azure-additional-properties}}
+{{#annotation}}@{{type}}({{#parameters.entrySet}}{{key}}={{{value}}}{{^-last}}, {{/-last}}{{/parameters.entrySet}}){{/annotation}} {{parameterName}}: {{{parameterType}}}{{^-last}}, {{/-last}}
+{{/vendorExtensions.x-azure-additional-properties}}
