@@ -15,7 +15,10 @@ import javax.naming.Binding;
 
 
 {{#operations}}
-class {{classname}}: {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api() {
+class {{classname}} {
+
+  val api = {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api()
+
 {{#operation}}
   {{#allParams}}
     {{#isEnum}}
@@ -41,7 +44,7 @@ class {{classname}}: {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api() 
     {{#removeEmptyLines}}{{#lambda.indented}}{{>methodParams}}{{/lambda.indented}}{{/removeEmptyLines}}
   ): HttpResponseMessage {
     {{#lambda.indented}}{{#removeEmptyLines}}{{>apiMethodBodyParameters}}{{/removeEmptyLines}}{{/lambda.indented}}
-    val response = super.{{operationId}}(request = request {{#vendorExtensions.x-azure-additional-properties}}, {{parameterName}} = {{parameterName}}{{/vendorExtensions.x-azure-additional-properties}}{{#allParams}}{{^isFormParam}}, {{paramName}} = {{paramName}}{{^defaultValue}}{{#required}}!!{{/required}}{{/defaultValue}}{{/isFormParam}}{{/allParams}})
+    val response = api.{{operationId}}(request = request {{#vendorExtensions.x-azure-additional-properties}}, {{parameterName}} = {{parameterName}}{{/vendorExtensions.x-azure-additional-properties}}{{#allParams}}{{^isFormParam}}, {{paramName}} = {{paramName}}{{^defaultValue}}{{#required}}!!{{/required}}{{/defaultValue}}{{/isFormParam}}{{/allParams}})
 
     val builder = request.createResponseBuilder(response.status).body(response.body)
     if(response.contentType != null){

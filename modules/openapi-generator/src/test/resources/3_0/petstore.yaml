@@ -97,7 +97,7 @@ paths:
                 - available
                 - pending
                 - sold
-              default: available
+              default: []
       responses:
         '200':
           description: successful operation
