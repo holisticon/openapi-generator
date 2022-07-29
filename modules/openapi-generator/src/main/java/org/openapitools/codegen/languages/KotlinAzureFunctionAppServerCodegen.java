@@ -109,6 +109,8 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
       (fragment, writer) -> writer.write(fragment.execute().replaceFirst("^/", ""));
     final Mustache.Lambda removeEmptyLines =
       (fragment, writer) -> writer.write(fragment.execute().replaceAll("(?m)^[ \t]*\r?\n+", "\n"));
+    final Mustache.Lambda trimLambda =
+      (fragment, writer) -> writer.write(fragment.execute().trim());
 
     class ContentTypeMapContext {
       public final String key;
@@ -155,6 +157,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
     additionalProperties.put("upperFirstLetter", upperFirstLetter);
     additionalProperties.put("removeEmptyLines", removeEmptyLines);
     additionalProperties.put("ContentTypeMap", contentTypeMap);
+    additionalProperties.put("trim", trimLambda);
   }
 
   private void processExtensionModel() {

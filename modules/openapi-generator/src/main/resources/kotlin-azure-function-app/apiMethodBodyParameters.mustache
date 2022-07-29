@@ -1,6 +1,6 @@
 {{#bodyParam}}val {{#bodyParam}}{{paramName}}{{/bodyParam}} = request.body {{/bodyParam}}
 {{#queryParams}}
-val {{paramName}} = request.queryParameters["{{paramName}}"]{{^isArray}}{{#isEnum}}?.let{ {{enumName}}_{{operationId}}.valueOf(it) }{{#defaultValue}} ?: {{enumName}}_{{operationId}}.valueOf("{{defaultValue}}"){{/defaultValue}}  {{/isEnum}}{{/isArray}}{{#isArray}}?.split(",")?.toTypedArray() ?: emptyArray(){{/isArray}}{{^isArray}}{{^isEnum}}{{#defaultValue}} ?: {{defaultValue}}{{/defaultValue}}{{^defaultValue}}{{/defaultValue}}{{/isEnum}}{{/isArray}}
+val {{paramName}} = request.queryParameters["{{paramName}}"]{{^isArray}}{{#isEnum}}?.let{ {{enumName}}_{{operationId}}.valueOf(it) }{{#defaultValue}} ?: {{enumName}}_{{operationId}}.valueOf("{{defaultValue}}"){{/defaultValue}}  {{/isEnum}}{{/isArray}}{{#isArray}}?.split(",")?.toTypedArray() ?: emptyArray(){{/isArray}}{{^isArray}}{{^isEnum}}{{#defaultValue}} ?: {{defaultValue}}{{/defaultValue}}{{^defaultValue}}{{/defaultValue}}{{/isEnum}}{{/isArray}}{{>parseQueryParameter}}
 {{/queryParams}}
 {{#headerParams}}
 val {{paramName}} = request.headers["{{paramName}}"]{{#isEnum}}?.let{ {{enumName}}_{{operationId}}.valueOf(it) }{{#defaultValue}} ?: {{enumName}}_{{operationId}}.valueOf("{{defaultValue}}"){{/defaultValue}}{{/isEnum}}{{^isEnum}}{{#defaultValue}} ?: {{defaultValue}}{{/defaultValue}}{{^defaultValue}}{{/defaultValue}}{{/isEnum}}
