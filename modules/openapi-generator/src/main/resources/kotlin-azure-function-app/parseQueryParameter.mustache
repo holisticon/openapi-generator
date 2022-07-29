@@ -1,0 +1,16 @@
+{{! in queryParams / CodegenParameter }}
+{{^isString}}
+  {{#trim}}
+  ?.let {
+  {{#isDate}}
+    {{dataType}}.parse(it)
+  {{/isDate}}
+  {{#isDateTime}}
+    {{dataType}}.parse(it)
+  {{/isDateTime}}
+  {{#isNumeric}}
+    {{dataType}}.parse(it)
+  {{/isNumeric}}
+  }
+  {{/trim}}
+{{/isString}}
