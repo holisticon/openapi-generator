@@ -107,6 +107,10 @@ class CompilationTest : StringSpec() {
         import apis.DefaultAzureFunctionInterface
         class DefaultApi : DefaultAzureFunctionInterface {}"""
 
+      val code2 = """
+        package apis
+        class DefaultXApi {}"""
+
       val aout = File(output).absoluteFile
 
       val res = cs(code1,
