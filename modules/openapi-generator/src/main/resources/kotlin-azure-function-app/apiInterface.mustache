@@ -18,7 +18,7 @@ interface {{classname}}Interface {
   fun {{operationId}}(
     {{#removeEmptyLines}}{{#lambda.indented}}{{>interfaceMethodParams}}{{/lambda.indented}}{{/removeEmptyLines}}
   ): {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result {
-    return throw NotImplementedError()
+    throw NotImplementedError()
   }
 
   data class {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result private constructor(
