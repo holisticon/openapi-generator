@@ -22,9 +22,8 @@ public class KotlinAzureFunctionAppGenTest {
   @Test(description = "test embedded enum array")
   public void embeddedEnumArrayTest() throws Exception {
     String openapiFile =
-      "/home/qn/fiege/wallbox-shipment/backend/command/src/main/resources/openapi/OMS_Shipment_API.yaml";
 //      "/3_0/3248-regression-dates.yaml";
-//      "/3_0/petstore-id-as-string.yaml";
+      "/3_0/petstore-id-as-string.yaml";
 //      "/3_0/oneOf.yaml";
 
     // paths
@@ -35,11 +34,9 @@ public class KotlinAzureFunctionAppGenTest {
     File output = new File(testProject + "target/generated-sources/openapi/");
 
     AbstractKotlinCodegen codegen = new
-      KotlinSpringServerCodegen();
-//      KotlinAzureFunctionAppServerCodegen();
+      KotlinAzureFunctionAppServerCodegen();
     codegen.setOutputDir(output.getAbsolutePath());
     String projectId = "org.openapitools.";
-    codegen.setTemplateDir("/home/qn/fiege/wallbox-shipment/backend/command/openapi/templates");
     codegen.setApiPackage(projectId + "api");
     codegen.setModelPackage(projectId + "api.model");
     codegen.additionalProperties().put(CodegenConstants.SOURCE_FOLDER, "src/gen/kotlin");
