@@ -62,16 +62,28 @@
         <system>github</system>
         <url>https://github.com/openapitools/openapi-generator/issues</url>
     </issueManagement>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
+  <!--      Remove me before merge-->
+  <distributionManagement>
+      <repository>
+        <id>gitlab-maven</id>
+        <url>https://gitlab.holisticon.de/api/v4/projects/2/packages/maven</url>
+      </repository>
+      <snapshotRepository>
+        <id>gitlab-maven</id>
+        <url>https://gitlab.holisticon.de/api/v4/projects/2/packages/maven</url>
+      </snapshotRepository>
     </distributionManagement>
+
+  <!--    <distributionManagement>-->
+<!--        <snapshotRepository>-->
+<!--            <id>ossrh</id>-->
+<!--            <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+<!--        </snapshotRepository>-->
+<!--        <repository>-->
+<!--            <id>ossrh</id>-->
+<!--            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
+<!--        </repository>-->
+<!--    </distributionManagement>-->
     <licenses>
         <license>
             <name>Apache License 2.0</name>
@@ -1481,6 +1493,11 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+<!--      Remove me before merge-->
+      <repository>
+        <id>gitlab-maven</id>
+        <url>https://gitlab.holisticon.de/api/v4/projects/2/packages/maven</url>
+      </repository>
     </repositories>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
