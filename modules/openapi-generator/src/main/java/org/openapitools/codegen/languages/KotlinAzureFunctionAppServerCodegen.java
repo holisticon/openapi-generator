@@ -180,7 +180,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
             this.setAzureExtensionsFile((String) additionalProperties.get(EXTENSION_MODEL_PROPERTY_KEY));
         }
         if (additionalProperties.containsKey(MUSTACHE_DEBUG_PROPERTY_KEY)) {
-            switch (additionalProperties.get(MUSTACHE_DEBUG_PROPERTY_KEY).toString().toLowerCase()) {
+            switch (additionalProperties.get(MUSTACHE_DEBUG_PROPERTY_KEY).toString().toLowerCase(Locale.ROOT)) {
                 case "1":
                 case "true":
                 case "t":
