@@ -38,6 +38,7 @@ nb-configuration.xml
 .direnv/
 
 .settings
+ci_settings.xml
 
 *.mustache~
 *.java~
