@@ -10,6 +10,7 @@ import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.media.Schema;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.text.CaseUtils;
 import org.openapitools.codegen.*;
@@ -18,14 +19,34 @@ import java.io.File;
 import java.util.*;
 
 import org.openapitools.codegen.meta.features.*;
+import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
 
+    @Override
+    public CodegenProperty fromProperty(String name, Schema p, boolean required, boolean schemaIsFromAdditionalProperties) {
+        Schema ref;
+        if (p.get$ref() != null && ModelUtils.getSimpleRef(p.get$ref()) != null) {
+            Schema resolvedRef = ModelUtils.getSchemas(this.openAPI).get(ModelUtils.getSimpleRef(p.get$ref()));
+            if (resolvedRef == null) {
+                logger.warn("could not resolve ref " + p.get$ref());
+                ref = p;
+            } else {
+                ref = resolvedRef;
+            }
+        } else {
+            ref = p;
+        }
+        return super.fromProperty(name, ref, required, schemaIsFromAdditionalProperties);
+    }
+
     protected Optional<String> azureExtensionsFile = Optional.empty();
     public static final String EXTENSION_MODEL_PROPERTY_KEY = "azureExtensionsFile";
     public static final String MUSTACHE_DEBUG_PROPERTY_KEY = "mustacheDebug";
+
+    public static final String GEN_IMPL_FOR_TESTS = "genImplForTests";
 
     public static final String PROJECT_NAME = "projectName";
     public static final String AZURE_EXTENSIONS_KEY = "x-azure-additional-properties";
@@ -77,6 +98,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
 
         cliOptions.add(new CliOption(EXTENSION_MODEL_PROPERTY_KEY, "path to file with azure functions extensions"));
         cliOptions.add(new CliOption(MUSTACHE_DEBUG_PROPERTY_KEY, "debug mustache templates"));
+        cliOptions.add(new CliOption(GEN_IMPL_FOR_TESTS, "generate 'custom' implementation for interface. Used in test "));
 
     }
 
@@ -159,6 +181,10 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
             if (mustacheDebug) writer.write("/*" + fragment.execute().trim() + "*/");
         };
 
+        final Mustache.Lambda genInterfaceImplLambda = (fragment, writer) -> {
+            if (genInterfaceImpl) writer.write(fragment.execute());
+        };
+
         final Mustache.Lambda dumpCtxLambda = (fragment, writer) -> {
             if (mustacheDebug) writer.write("/*\n CTX: \n" + fragment.context().toString() + "\n*/");
         };
@@ -171,9 +197,11 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         additionalProperties.put("trim", trimLambda);
         additionalProperties.put("debug", debugLambda);
         additionalProperties.put("dump", dumpCtxLambda);
+        additionalProperties.put("genInterfaceImpl", genInterfaceImplLambda);
     }
 
     boolean mustacheDebug = false;
+    boolean genInterfaceImpl = false;
 
     private void processExtensionModel() {
         if (additionalProperties.containsKey(EXTENSION_MODEL_PROPERTY_KEY)) {
@@ -188,6 +216,18 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
                     break;
                 default:
                     logger.warn(MUSTACHE_DEBUG_PROPERTY_KEY + " set to unknown value " + additionalProperties.get(MUSTACHE_DEBUG_PROPERTY_KEY));
+                    break;
+            }
+        }
+        if (additionalProperties.containsKey(GEN_IMPL_FOR_TESTS)) {
+            switch (additionalProperties.get(GEN_IMPL_FOR_TESTS).toString().toLowerCase(Locale.ROOT)) {
+                case "1":
+                case "true":
+                case "t":
+                    genInterfaceImpl = true;
+                    break;
+                default:
+                    logger.warn(GEN_IMPL_FOR_TESTS + " set to unknown value " + additionalProperties.get(GEN_IMPL_FOR_TESTS));
                     break;
             }
         }

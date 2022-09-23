@@ -41,6 +41,7 @@ object CompilationTestHelper {
           to?.let { cfg.outputDir = it }
           extensionModelInputFile?.let { cfg.additionalProperties()[KotlinAzureFunctionAppServerCodegen.EXTENSION_MODEL_PROPERTY_KEY] = it }
           cfg.additionalProperties()[KotlinAzureFunctionAppServerCodegen.MUSTACHE_DEBUG_PROPERTY_KEY] = true
+          cfg.additionalProperties()[KotlinAzureFunctionAppServerCodegen.GEN_IMPL_FOR_TESTS] = true
           // output.absolutePath
           // val projectId = "org.openapitools."
           // codegen.setApiPackage(projectId + "api")

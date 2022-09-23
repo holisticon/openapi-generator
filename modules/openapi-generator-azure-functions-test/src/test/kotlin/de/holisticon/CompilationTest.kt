@@ -18,14 +18,19 @@ class CompilationTest : FreeSpec() {
 
     "regression" - {
       withData(
+        listOf(
         "3134-regression",
         "3248-regression",
+        "3248-regression-ref-lvl0",
+        "3248-regression-ref-lvl1",
         "3248-regression-dates"
+        )
+
       ) { filename ->
         val openapiFile = openApiFiles / "$filename.yaml"
         generateOpenApi(openapiFile = openapiFile, to = testOut)
 
-        val res = compile(File(testOut).absoluteFile.recursiveKtFiles, defaultApi())
+        val res = compile(File(testOut).absoluteFile.recursiveKtFiles, "")
 
         withClue("From ${File(openapiFile).absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
       }
