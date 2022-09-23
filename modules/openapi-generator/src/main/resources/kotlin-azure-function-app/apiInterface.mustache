@@ -12,8 +12,26 @@ import com.microsoft.azure.functions.annotation.*
 
 
 {{#operations}}
+{{#genInterfaceImpl}}
+class {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api: {{classname}}Interface {}
+{{/genInterfaceImpl}}
+
 interface {{classname}}Interface {
 {{#operation}}
+    {{#allParams}}
+        {{#isEnum}}
+            {{#isDeprecated}}
+                @Deprecated(message = "This enum is deprecated.")
+            {{/isDeprecated}}
+            enum class {{enumName}}_{{operationId}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) {
+            {{#allowableValues}}
+                {{#enumVars}}
+                    {{&name}}({{{value}}}){{^-last}},{{/-last}}
+                {{/enumVars}}
+            {{/allowableValues}}
+            }
+        {{/isEnum}}
+    {{/allParams}}
 
   fun {{operationId}}(
     {{#removeEmptyLines}}{{#lambda.indented}}{{>interfaceMethodParams}}{{/lambda.indented}}{{/removeEmptyLines}}

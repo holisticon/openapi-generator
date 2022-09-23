@@ -1,5 +1,8 @@
 package {{package}}
 
+{{#debug}} // api.mustache {{/debug}}
+{{#dump}}{{/dump}}
+
 {{#imports}}import {{import}}
 {{/imports}}
 
@@ -20,22 +23,6 @@ class {{classname}} {
   val api: {{classname}}Interface = {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api()
 
 {{#operation}}
-  {{#allParams}}
-    {{#isEnum}}
-      {{#isDeprecated}}
-      @Deprecated(message = "This enum is deprecated.")
-      {{/isDeprecated}}
-      enum class {{enumName}}_{{operationId}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) {
-        {{#allowableValues}}
-          {{#enumVars}}
-              {{&name}}({{{value}}}){{^-last}},{{/-last}}
-          {{/enumVars}}
-        {{/allowableValues}}
-      }
-
-    {{/isEnum}}
-  {{/allParams}}
-
   @FunctionName("{{operationId}}")
   {{#isDeprecated}}
   @Deprecated(message = "This function is deprecated.")

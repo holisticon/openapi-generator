@@ -1,10 +1,10 @@
 {{#bodyParam}}val {{#bodyParam}}{{paramName}}{{/bodyParam}} = request.body {{/bodyParam}}{{!
 
 }}{{#queryParams}}
-// query parameters {{! ----------------------  queryParams ----------------------}}
+// query parameter {{! ----------------------  queryParams ----------------------}}
 val {{paramName}} = request.queryParameters["{{paramName}}"]{{!
 }}{{^isArray}}{{#isEnum}}{{#debug}} <<< no array and enum >>>
-{{/debug}}?.let{ {{enumName}}_{{operationId}}.valueOf(it) }{{#defaultValue}} ?: {{enumName}}_{{operationId}}.valueOf("{{defaultValue}}"){{/defaultValue}}  {{/isEnum}}{{/isArray}}{{!
+{{/debug}}?.let{ {{enumName}}.valueOf(it) }{{#defaultValue}} ?: {{enumName}}.valueOf("{{defaultValue}}"){{/defaultValue}}  {{/isEnum}}{{/isArray}}{{!
 }}{{#isArray}}{{#debug}} <<< array >>>{{/debug}}{{!
 }}?.split(",")?.toTypedArray() ?: emptyArray(){{/isArray}}{{!
 }}{{^isArray}}{{^isEnum}}{{#debug}} <<< no array no enum >>> {{/debug}}{{#dump}}{{/dump}}{{#defaultValue}} ?: {{defaultValue}}{{/defaultValue}}{{^defaultValue}}{{/defaultValue}}{{/isEnum}}{{/isArray}}{{!
@@ -12,7 +12,7 @@ val {{paramName}} = request.queryParameters["{{paramName}}"]{{!
 {{/queryParams}}
 
 {{#headerParams}}
-// header parameters {{! ----------------------  headerParams ----------------------}}
+// header parameter {{! ----------------------  headerParams ----------------------}}
 val {{paramName}} = request.headers["{{paramName}}"]{{#isEnum}}?.let{ {{enumName}}_{{operationId}}.valueOf(it) }{{#defaultValue}} ?: {{enumName}}_{{operationId}}.valueOf("{{defaultValue}}"){{/defaultValue}}{{/isEnum}}{{^isEnum}}{{#defaultValue}} ?: {{defaultValue}}{{/defaultValue}}{{^defaultValue}}{{/defaultValue}}{{/isEnum}}
 {{/headerParams}}
 
