@@ -28,7 +28,8 @@ public class CodegenParameter implements IJsonSchemaValidationProperties {
     public boolean isFormParam, isQueryParam, isPathParam, isHeaderParam,
             isCookieParam, isBodyParam, isContainer,
             isCollectionFormatMulti, isPrimitiveType, isModel, isExplode, isDeepObject, isAllowEmptyValue;
-    public String baseName, paramName, dataType, datatypeWithEnum, dataFormat, contentType,
+    public String baseName,
+            paramName, dataType, datatypeWithEnum, dataFormat, contentType,
             collectionFormat, description, unescapedDescription, baseType, defaultValue, enumName, style;
 
     public String nameInLowerCase; // property name in lower case

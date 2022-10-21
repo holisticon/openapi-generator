@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
 
-    @Override
+ /*   @Override
     public CodegenProperty fromProperty(String name, Schema p, boolean required, boolean schemaIsFromAdditionalProperties) {
         Schema ref;
         if (p.get$ref() != null && ModelUtils.getSimpleRef(p.get$ref()) != null) {
@@ -40,7 +40,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
             ref = p;
         }
         return super.fromProperty(name, ref, required, schemaIsFromAdditionalProperties);
-    }
+    }*/
 
     protected Optional<String> azureExtensionsFile = Optional.empty();
     public static final String EXTENSION_MODEL_PROPERTY_KEY = "azureExtensionsFile";
