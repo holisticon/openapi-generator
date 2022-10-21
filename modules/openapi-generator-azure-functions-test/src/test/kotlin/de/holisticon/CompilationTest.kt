@@ -22,14 +22,14 @@ class CompilationTest : FreeSpec() {
   init {
     val openApiFiles = ".." / "openapi-generator" / "src" / "test" / "resources" / "3_0"
 
-    "regression spring" - {
+    "! regression spring" - {
       withData(
         listOf(
-          "3134-regression",
+//          "3134-regression",
           "3248-regression",
-          "3248-regression-ref-lvl0",
-          "3248-regression-ref-lvl1",
-          "3248-regression-dates"
+//          "3248-regression-ref-lvl0",
+//          "3248-regression-ref-lvl1",
+//          "3248-regression-dates"
         )
 
       ) { filename ->
@@ -43,14 +43,16 @@ class CompilationTest : FreeSpec() {
     }
 
 
-    "f: regression" - {
+    "regression" - {
       withData(
         listOf(
-//          "3134-regression",
+          "3134-regression",
           "3248-regression",
-//          "3248-regression-ref-lvl0",
-//          "3248-regression-ref-lvl1",
-//          "3248-regression-dates"
+          "3248-regression-required",
+          "3248-regression-required-no-default",
+          "3248-regression-ref-lvl0",
+          "3248-regression-ref-lvl1",
+          "3248-regression-dates"
         )
 
       ) { filename ->
@@ -64,8 +66,4 @@ class CompilationTest : FreeSpec() {
     }
   }
 
-  fun defaultApi(): String = """
-        package apis
-        import apis.DefaultAzureFunctionInterface
-        class DefaultApi : DefaultAzureFunctionInterface {}"""
 }

@@ -1,7 +1,7 @@
 {{! in queryParams / CodegenParameter }}
-{{^isString}}
-  {{#trim}}
+{{^isString}}{{#trim1L}}
   ?.let {
+  {{#debug}}parse non string query parameter{{/debug}}
   {{#isDate}}
     {{dataType}}.parse(it)
   {{/isDate}}
@@ -11,6 +11,28 @@
   {{#isNumeric}}
     {{dataType}}.parse(it)
   {{/isNumeric}}
+  {{#hiddenEnum}}
+    {{>smartDataType}}.valueOf(it){{#debug}}hiddenEnum{{/debug}}
+  {{/hiddenEnum}}
+  {{#debug}}data type matching in parseQueryParameter {{/debug}}
   }
-  {{/trim}}
-{{/isString}}
+{{/trim1L}}{{/isString}}
+{{#isEnum}}{{! nested enums are strings as base type }}
+    ?.let { {{datatypeWithEnum}}.valueOf(it) }{{#debug}}isEnum{{/debug}}{{#dump}}{{/dump}}
+{{/isEnum}}
+{{#defaultValue}}
+    {{#trim1L}}
+    ?:
+    {{#isEnum}}
+        {{>smartDataType}}.{{#debug}}isEnum{{/debug}}
+    {{/isEnum}}
+    {{#hiddenEnum}}
+        {{>smartDataType}}.{{#debug}}hiddenEnum{{/debug}}
+    {{/hiddenEnum}}
+    {{#enum}}
+        {{>smartDataType}}.{{#debug}}enum{{/debug}}
+    {{/enum}}
+    {{#break}}{{/break}}
+    {{defaultValue}}{{#debug}}set default value{{/debug}}
+    {{/trim1L}}
+{{/defaultValue}}

@@ -1,0 +1,9 @@
+{{! try use datatypeWithEnum first, otherwise dataType }}
+{{#trim}}
+{{#datatypeWithEnum}}
+{{{datatypeWithEnum}}}
+{{/datatypeWithEnum}}
+{{^datatypeWithEnum}}
+{{{dataType}}}
+{{/datatypeWithEnum}}
+{{/trim}}
