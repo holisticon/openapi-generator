@@ -7,7 +7,7 @@ val {{paramName}} = request.queryParameters["{{paramName}}"]{{!
 {{/debug}}?.let{ {{enumName}}.valueOf(it) }{{#defaultValue}} ?: {{enumName}}.valueOf("{{defaultValue}}"){{/defaultValue}}  {{/isEnum}}{{/isArray}}{{!
 }}{{#isArray}}{{#debug}} <<< array >>>{{/debug}}{{!
 }}?.split(",")?.toTypedArray() ?: emptyArray(){{/isArray}}{{!
-}}{{^isArray}}{{^isEnum}}{{#debug}} <<< no array no enum >>> {{/debug}}{{#dump}}{{/dump}}{{#defaultValue}} ?: {{defaultValue}}{{/defaultValue}}{{^defaultValue}}{{/defaultValue}}{{/isEnum}}{{/isArray}}{{!
+}}{{^isArray}}{{^isEnum}}{{#debug}} <<< no array no enum >>> {{/debug}}{{#dump}}{{/dump}}{{#defaultValue}} ?: {{{dataType}}}.{{defaultValue}}{{/defaultValue}}{{^defaultValue}}{{/defaultValue}}{{/isEnum}}{{/isArray}}{{!
 }}{{>parseQueryParameter}}
 {{/queryParams}}
 

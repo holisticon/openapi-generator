@@ -9,6 +9,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.parser.core.models.ParseOptions
 import org.jetbrains.kotlin.utils.addToStdlib.ifNotEmpty
 import org.openapitools.codegen.ClientOptInput
+import org.openapitools.codegen.CodegenConfig
 import org.openapitools.codegen.DefaultGenerator
 import org.openapitools.codegen.languages.KotlinAzureFunctionAppServerCodegen
 import org.openapitools.codegen.utils.ModelUtils
@@ -33,23 +34,29 @@ object CompilationTestHelper {
     return openAPI
   }
 
-  fun generateOpenApi(openapiFile: String, extensionModelInputFile: String? = null, to: String?) {
+  fun kotlinAzureServerCodegen(extensionModelInputFile: String? = null, to: String?): CodegenConfig =
+    KotlinAzureFunctionAppServerCodegen().also { cfg ->
+      to?.let { cfg.outputDir = it }
+      extensionModelInputFile?.let { cfg.additionalProperties()[KotlinAzureFunctionAppServerCodegen.EXTENSION_MODEL_PROPERTY_KEY] = it }
+      cfg.additionalProperties()[KotlinAzureFunctionAppServerCodegen.MUSTACHE_DEBUG_PROPERTY_KEY] = true
+      cfg.additionalProperties()[KotlinAzureFunctionAppServerCodegen.GEN_IMPL_FOR_TESTS] = true
+      // output.absolutePath
+      // val projectId = "org.openapitools."
+      // codegen.setApiPackage(projectId + "api")
+      // codegen.setModelPackage(projectId + "api.model")
+      // codegen.additionalProperties()[CodegenConstants.SOURCE_FOLDER] = "src/gen/kotlin"
+      // codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, baseModelPackage + ".yyyy.model.xxxx");
+    }
+
+  fun generateOpenApi(
+    openapiFile: String,
+    to: String?,
+    extensionModelInputFile: String? = null,
+    generator: CodegenConfig = kotlinAzureServerCodegen(extensionModelInputFile, to)
+  ) {
     val options = ClientOptInput().apply {
       openAPI(parseSpec(openapiFile))
-      config(
-        KotlinAzureFunctionAppServerCodegen().also { cfg ->
-          to?.let { cfg.outputDir = it }
-          extensionModelInputFile?.let { cfg.additionalProperties()[KotlinAzureFunctionAppServerCodegen.EXTENSION_MODEL_PROPERTY_KEY] = it }
-          cfg.additionalProperties()[KotlinAzureFunctionAppServerCodegen.MUSTACHE_DEBUG_PROPERTY_KEY] = true
-          cfg.additionalProperties()[KotlinAzureFunctionAppServerCodegen.GEN_IMPL_FOR_TESTS] = true
-          // output.absolutePath
-          // val projectId = "org.openapitools."
-          // codegen.setApiPackage(projectId + "api")
-          // codegen.setModelPackage(projectId + "api.model")
-          // codegen.additionalProperties()[CodegenConstants.SOURCE_FOLDER] = "src/gen/kotlin"
-          // codegen.additionalProperties().put(CodegenConstants.MODEL_PACKAGE, baseModelPackage + ".yyyy.model.xxxx");
-        }
-      )
+      config(generator)
     }
     DefaultGenerator().opts(options).generate()
   }
@@ -67,10 +74,12 @@ object CompilationTestHelper {
 
   val String.pathReady: String
     get() = this.let { "\\s".toRegex().replace(it, "_") }
+
   val TestScope.parentPath: String
     get() = this.testCase.parents().let { parents ->
       parents.map { it.name.testName.pathReady }.joinToString(separator = File.separator) + (parents.ifNotEmpty { File.separator } ?: "")
     }
+
   val TestScope.testOut: String
     get() = "target" / "compile-test-generated-sources" / "${this.parentPath}${this.testCase.name.testName.pathReady}"
 
