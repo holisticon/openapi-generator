@@ -1,7 +1,6 @@
 package {{package}}
 
-{{#debug}} // api.mustache {{/debug}}
-{{#dump}}{{/dump}}
+{{#debug}}api.mustache{{/debug}}
 
 {{#imports}}import {{import}}
 {{/imports}}
@@ -14,8 +13,11 @@ import com.microsoft.azure.*
 import com.microsoft.azure.functions.*
 import com.microsoft.azure.functions.annotation.*
 
-import javax.naming.Binding;
+import javax.naming.Binding
 
+{{#operations}}{{#operation}}{{#allParams}}{{#isEnum}}
+import {{package}}.{{classname}}Interface.Companion.{{datatypeWithEnum}}
+{{/isEnum}}{{/allParams}}{{/operation}}{{/operations}}
 
 {{#operations}}
 class {{classname}} {

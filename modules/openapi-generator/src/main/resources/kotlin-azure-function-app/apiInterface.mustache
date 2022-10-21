@@ -1,4 +1,5 @@
 package {{package}}
+{{#debug}}apiInterface.mustache{{/debug}}
 
 {{#imports}}import {{import}}
 {{/imports}}
@@ -18,13 +19,14 @@ class {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api: {{classname}}Int
 
 interface {{classname}}Interface {
 {{#operation}}
+    companion object {
     {{#allParams}}
         {{#isEnum}}
             {{#dump}}{{/dump}}
             {{#isDeprecated}}
                 @Deprecated(message = "This enum is deprecated.")
             {{/isDeprecated}}
-            enum class {{enumName}}_{{operationId}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) {
+            enum class {{datatypeWithEnum}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) {
             {{#allowableValues}}
                 {{#enumVars}}
                     {{&name}}({{{value}}}){{^-last}},{{/-last}}
@@ -33,6 +35,7 @@ interface {{classname}}Interface {
             }
         {{/isEnum}}
     {{/allParams}}
+    }
 
   fun {{operationId}}(
     {{#removeEmptyLines}}{{#lambda.indented}}{{>interfaceMethodParams}}{{/lambda.indented}}{{/removeEmptyLines}}

@@ -11,12 +11,19 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.parameters.Parameter;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.CaseUtils;
 import org.openapitools.codegen.*;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.openapitools.codegen.meta.features.*;
 import org.openapitools.codegen.utils.ModelUtils;
@@ -24,23 +31,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
+    private <T> Stream<T> toStream(Optional<T> o) {
+        return o.map(Stream::of).orElse(Stream.empty());
+    }
 
- /*   @Override
-    public CodegenProperty fromProperty(String name, Schema p, boolean required, boolean schemaIsFromAdditionalProperties) {
-        Schema ref;
-        if (p.get$ref() != null && ModelUtils.getSimpleRef(p.get$ref()) != null) {
-            Schema resolvedRef = ModelUtils.getSchemas(this.openAPI).get(ModelUtils.getSimpleRef(p.get$ref()));
-            if (resolvedRef == null) {
-                logger.warn("could not resolve ref " + p.get$ref());
-                ref = p;
-            } else {
-                ref = resolvedRef;
+    @Override
+    public CodegenParameter fromParameter(Parameter parameter, Set<String> imports) {
+        CodegenParameter res = super.fromParameter(parameter, imports);
+        if (res.isEnum) { //means non-$ref enum
+            ImmutableTriple<PathItem.HttpMethod, String, Operation> parent = super.openAPI.getPaths().entrySet().stream()
+                    .flatMap(t ->
+                            toStream(t
+                                    .getValue().readOperationsMap().entrySet().stream()
+                                    .filter(p -> p.getValue().getParameters().contains(parameter)).findFirst()
+                                    .map(i -> ImmutableTriple.of(i.getKey()/*method*/, t.getKey()/*path*/, i.getValue()/*op*/))
+                            ))
+                    .findFirst().orElse(null);
+            if(parent != null) {
+                String orGenerateOperationId = getOrGenerateOperationId(parent.getRight(), parent.getMiddle(), parent.getLeft().name().toLowerCase());
+                res.datatypeWithEnum = res.enumName + "_" + orGenerateOperationId;
             }
-        } else {
-            ref = p;
         }
-        return super.fromProperty(name, ref, required, schemaIsFromAdditionalProperties);
-    }*/
+        return res;
+    }
 
     protected Optional<String> azureExtensionsFile = Optional.empty();
     public static final String EXTENSION_MODEL_PROPERTY_KEY = "azureExtensionsFile";
@@ -136,6 +149,8 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
                 (fragment, writer) -> writer.write(fragment.execute().replaceAll("(?m)^[ \t]*\r?\n+", "\n"));
         final Mustache.Lambda trimLambda =
                 (fragment, writer) -> writer.write(fragment.execute().trim());
+        final Mustache.Lambda noNewlines =
+                (fragment, writer) -> writer.write(fragment.execute().replaceAll("\\n", ""));
 
         class ContentTypeMapContext {
             public final String key;
@@ -177,6 +192,27 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
                     }
                 };
 
+        final Mustache.Lambda hiddenEnum =
+                (fragment, writer) -> {
+                    Object ctx = fragment.context();
+                    for (int i = 1; ctx != null && !(ctx instanceof CodegenParameter); i++) {
+                        try {
+                            ctx = fragment.context(i);
+                        } catch (NullPointerException e) {
+                            ctx = null;
+                        }
+                    }
+                    if (ctx instanceof CodegenParameter) {
+                        CodegenParameter codegenParameter = (CodegenParameter) ctx;
+                        Map<String, Object> allowableValues = codegenParameter.getSchema().getAllowableValues();
+                        if (!codegenParameter.isEnum && allowableValues != null && allowableValues.get("enumVars") != null) {
+                            fragment.execute(fragment.context(), writer);
+                        }
+                    } else {
+                        throw new IllegalStateException("Wrong usage of hiddenEnum");
+                    }
+                };
+
         final Mustache.Lambda debugLambda = (fragment, writer) -> {
             if (mustacheDebug) writer.write("/*" + fragment.execute().trim() + "*/");
         };
@@ -185,19 +221,35 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
             if (genInterfaceImpl) writer.write(fragment.execute());
         };
 
-        final Mustache.Lambda dumpCtxLambda = (fragment, writer) -> {
-            if (mustacheDebug) writer.write("/*\n CTX: \n" + fragment.context().toString() + "\n*/");
+        final Function<Integer, Mustache.Lambda> dumpCtxLambda = (i) -> (fragment, writer) -> {
+            if (mustacheDebug)
+                writer.write("/*\n CTX [" + fragment.context(i).getClass() + "]: \n" + fragment.context(i).toString() + "\n*/");
+        };
+        final Mustache.Lambda breakLambda = (fragment, writer) -> {
+            Object context = fragment.context();
+            logger.trace(context.toString());//put breakpoint here to stop
+        };
+
+        final Mustache.Lambda trimToOneLine = (fragment, writer) -> {
+            if (genInterfaceImpl) writer.write(
+                    Arrays.stream(fragment.execute().split("\\n")).map(String::trim).collect(Collectors.joining())
+            );
         };
 
         additionalProperties.put("removeApiSuffix", removeApiSuffix);
         additionalProperties.put("formatPath", formatPath);
         additionalProperties.put("upperFirstLetter", upperFirstLetter);
         additionalProperties.put("removeEmptyLines", removeEmptyLines);
+        additionalProperties.put("noNewlines", noNewlines);
         additionalProperties.put("ContentTypeMap", contentTypeMap);
+        additionalProperties.put("hiddenEnum", hiddenEnum);
         additionalProperties.put("trim", trimLambda);
         additionalProperties.put("debug", debugLambda);
-        additionalProperties.put("dump", dumpCtxLambda);
+        additionalProperties.put("dump", dumpCtxLambda.apply(0));
+        additionalProperties.put("dump1", dumpCtxLambda.apply(1));
+        additionalProperties.put("break", breakLambda);
         additionalProperties.put("genInterfaceImpl", genInterfaceImplLambda);
+        additionalProperties.put("trim1L", trimToOneLine);
     }
 
     boolean mustacheDebug = false;
