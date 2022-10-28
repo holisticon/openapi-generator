@@ -85,12 +85,12 @@ class CompilationTest : FreeSpec() {
   suspend fun ContainerScope.testTraverse(input: File, testFun: ContainerScope.(File) -> Unit) {
     val content = input.listFiles()!!.toList().filterNotNull()
     val (dirs, files) = content.partition { f -> f.isDirectory }
-    dirs.forEach { d ->
+    dirs.sortedBy { d -> d.name }.forEach { d ->
       registerContainer(TestName(d.name), false, null) {
         this@testTraverse.testTraverse(d, testFun)
       }
     }
-    files.forEach { f ->
+    files.sortedBy { d -> d.name }.forEach { f ->
       registerTest(TestName(f.name), false, null) {
         this@testTraverse.testFun(f)
       }
