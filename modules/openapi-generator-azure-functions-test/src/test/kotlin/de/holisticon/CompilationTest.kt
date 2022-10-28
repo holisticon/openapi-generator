@@ -7,10 +7,11 @@ import de.holisticon.CompilationTestHelper.generateOpenApi
 import de.holisticon.CompilationTestHelper.recursiveKtFiles
 import de.holisticon.CompilationTestHelper.testOut
 import io.kotest.assertions.withClue
+import io.kotest.core.names.TestName
 import io.kotest.core.spec.style.FreeSpec
+import io.kotest.core.spec.style.scopes.*
 import io.kotest.datatest.withData
 import io.kotest.matchers.comparables.shouldBeEqualComparingTo
-import org.openapitools.codegen.languages.KotlinAzureFunctionAppServerCodegen
 import org.openapitools.codegen.languages.KotlinSpringServerCodegen
 import java.io.File
 
@@ -20,20 +21,22 @@ class CompilationTest : FreeSpec() {
   }
 
   init {
-    val openApiFiles = ".." / "openapi-generator" / "src" / "test" / "resources" / "3_0"
+    val openApiFiles = ".." / "openapi-generator" / "src" / "test" / "resources"
+    val openApiFiles30 = openApiFiles / "3_0"
+    val openApiFiles31 = openApiFiles / "3_1"
 
-    "! regression spring" - {
+
+  // generate spring for code. just used for debugging
+    "regression spring".config(enabled = false, ) - {
       withData(
         listOf(
-//          "3134-regression",
           "3248-regression",
-//          "3248-regression-ref-lvl0",
-//          "3248-regression-ref-lvl1",
-//          "3248-regression-dates"
+          "3248-regression-ref-lvl0",
+          "3248-regression-ref-lvl1",
+          "3248-regression-dates"
         )
-
       ) { filename ->
-        val openapiFile = openApiFiles / "$filename.yaml"
+        val openapiFile = openApiFiles30 / "$filename.yaml"
         generateOpenApi(openapiFile = openapiFile, to = testOut, generator = springGen(testOut))
 
         val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
@@ -42,8 +45,21 @@ class CompilationTest : FreeSpec() {
       }
     }
 
+    "regression 3.0" - {
+      testTraverse(File(openApiFiles30)) { file ->
+        val res = compile(file.absoluteFile.recursiveKtFiles)
+        withClue("From ${file.absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
+      }
+    }
+    "regression 3.1" - {
+      testTraverse(File(openApiFiles31)) { file ->
+        val res = compile(file.absoluteFile.recursiveKtFiles)
+        withClue("From ${file.absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
+      }
+    }
 
-    "regression" - {
+    // used to manually call individual tests
+    "!regression".config(enabled = false) - {
       withData(
         listOf(
           "3134-regression",
@@ -56,7 +72,7 @@ class CompilationTest : FreeSpec() {
         )
 
       ) { filename ->
-        val openapiFile = openApiFiles / "$filename.yaml"
+        val openapiFile = openApiFiles30 / "$filename.yaml"
         generateOpenApi(openapiFile = openapiFile, to = testOut)
 
         val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
@@ -66,4 +82,18 @@ class CompilationTest : FreeSpec() {
     }
   }
 
+  suspend fun ContainerScope.testTraverse(input: File, testFun: ContainerScope.(File) -> Unit) {
+    val content = input.listFiles()!!.toList().filterNotNull()
+    val (dirs, files) = content.partition { f -> f.isDirectory }
+    dirs.forEach { d ->
+      registerContainer(TestName(d.name), false, null) {
+        this@testTraverse.testTraverse(d, testFun)
+      }
+    }
+    files.forEach { f ->
+      registerTest(TestName(f.name), false, null) {
+        this@testTraverse.testFun(f)
+      }
+    }
+  }
 }
