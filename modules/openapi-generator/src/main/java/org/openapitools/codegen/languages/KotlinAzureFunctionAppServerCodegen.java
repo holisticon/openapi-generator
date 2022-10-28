@@ -43,11 +43,12 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
                     .flatMap(t ->
                             toStream(t
                                     .getValue().readOperationsMap().entrySet().stream()
+                                    .filter(Objects::isNull)
                                     .filter(p -> p.getValue().getParameters().contains(parameter)).findFirst()
                                     .map(i -> ImmutableTriple.of(i.getKey()/*method*/, t.getKey()/*path*/, i.getValue()/*op*/))
                             ))
                     .findFirst().orElse(null);
-            if(parent != null) {
+            if (parent != null) {
                 String orGenerateOperationId = getOrGenerateOperationId(parent.getRight(), parent.getMiddle(), parent.getLeft().name().toLowerCase());
                 res.datatypeWithEnum = res.enumName + "_" + orGenerateOperationId;
             }
@@ -204,8 +205,8 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
                     }
                     if (ctx instanceof CodegenParameter) {
                         CodegenParameter codegenParameter = (CodegenParameter) ctx;
-                        Map<String, Object> allowableValues = codegenParameter.getSchema().getAllowableValues();
-                        if (!codegenParameter.isEnum && allowableValues != null && allowableValues.get("enumVars") != null) {
+                        CodegenProperty schema = codegenParameter.getSchema();
+                        if (!codegenParameter.isEnum && schema != null && schema.getAllowableValues() != null && schema.getAllowableValues().get("enumVars") != null) {
                             fragment.execute(fragment.context(), writer);
                         }
                     } else {

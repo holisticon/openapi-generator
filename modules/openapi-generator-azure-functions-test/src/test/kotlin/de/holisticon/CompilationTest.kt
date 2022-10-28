@@ -10,6 +10,7 @@ import io.kotest.assertions.withClue
 import io.kotest.core.names.TestName
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.core.spec.style.scopes.*
+import io.kotest.core.test.TestScope
 import io.kotest.datatest.withData
 import io.kotest.matchers.comparables.shouldBeEqualComparingTo
 import org.openapitools.codegen.languages.KotlinSpringServerCodegen
@@ -26,8 +27,8 @@ class CompilationTest : FreeSpec() {
     val openApiFiles31 = openApiFiles / "3_1"
 
 
-  // generate spring for code. just used for debugging
-    "regression spring".config(enabled = false, ) - {
+    // generate spring for code. just used for debugging
+    "regression spring".config(enabled = false) - {
       withData(
         listOf(
           "3248-regression",
@@ -45,21 +46,24 @@ class CompilationTest : FreeSpec() {
       }
     }
 
+
     "regression 3.0" - {
       testTraverse(File(openApiFiles30)) { file ->
-        val res = compile(file.absoluteFile.recursiveKtFiles)
+        generateOpenApi(openapiFile = file.absolutePath, to = testOut)
+        val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
         withClue("From ${file.absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
       }
     }
     "regression 3.1" - {
       testTraverse(File(openApiFiles31)) { file ->
-        val res = compile(file.absoluteFile.recursiveKtFiles)
+        generateOpenApi(openapiFile = file.absolutePath, to = testOut)
+        val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
         withClue("From ${file.absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
       }
     }
 
     // used to manually call individual tests
-    "!regression".config(enabled = false) - {
+    "!regression" - {
       withData(
         listOf(
           "3134-regression",
@@ -82,17 +86,19 @@ class CompilationTest : FreeSpec() {
     }
   }
 
-  suspend fun ContainerScope.testTraverse(input: File, testFun: ContainerScope.(File) -> Unit) {
+  suspend fun ContainerScope.testTraverse(input: File, extensionFilter: Set<String> = setOf("yaml", "yml"), testFun: TestScope.(File) -> Unit) {
     val content = input.listFiles()!!.toList().filterNotNull()
-    val (dirs, files) = content.partition { f -> f.isDirectory }
+    val (dirs, files) = content
+      .filter { it.isDirectory || (it.isFile && extensionFilter.contains(it.extension))}
+      .partition { f -> f.isDirectory }
     dirs.sortedBy { d -> d.name }.forEach { d ->
       registerContainer(TestName(d.name), false, null) {
-        this@testTraverse.testTraverse(d, testFun)
+        FreeSpecContainerScope(this).testTraverse(d, extensionFilter, testFun)
       }
     }
-    files.sortedBy { d -> d.name }.forEach { f ->
+    files.sortedBy { it.name }.map{ it.absoluteFile }.forEach { f ->
       registerTest(TestName(f.name), false, null) {
-        this@testTraverse.testFun(f)
+        this.testFun(f)
       }
     }
   }
