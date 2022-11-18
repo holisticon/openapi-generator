@@ -18,24 +18,24 @@ class {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api: {{classname}}Int
 {{/genInterfaceImpl}}
 
 interface {{classname}}Interface {
+  companion object {
+  {{#allParams}}
+    {{#isEnum}}
+      {{#dump}}{{/dump}}
+      {{#isDeprecated}}
+        @Deprecated(message = "This enum is deprecated.")
+      {{/isDeprecated}}
+      enum class {{datatypeWithEnum}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) {
+      {{#allowableValues}}
+        {{#enumVars}}
+          {{&name}}({{{value}}}){{^-last}},{{/-last}}
+        {{/enumVars}}
+      {{/allowableValues}}
+      }
+    {{/isEnum}}
+  {{/allParams}}
+  }
 {{#operation}}
-    companion object {
-    {{#allParams}}
-        {{#isEnum}}
-            {{#dump}}{{/dump}}
-            {{#isDeprecated}}
-                @Deprecated(message = "This enum is deprecated.")
-            {{/isDeprecated}}
-            enum class {{datatypeWithEnum}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) {
-            {{#allowableValues}}
-                {{#enumVars}}
-                    {{&name}}({{{value}}}){{^-last}},{{/-last}}
-                {{/enumVars}}
-            {{/allowableValues}}
-            }
-        {{/isEnum}}
-    {{/allParams}}
-    }
 
   fun {{operationId}}(
     {{#removeEmptyLines}}{{#lambda.indented}}{{>interfaceMethodParams}}{{/lambda.indented}}{{/removeEmptyLines}}
