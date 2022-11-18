@@ -49,7 +49,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
                             ))
                     .findFirst().orElse(null);
             if (parent != null) {
-                String orGenerateOperationId = getOrGenerateOperationId(parent.getRight(), parent.getMiddle(), parent.getLeft().name().toLowerCase());
+                String orGenerateOperationId = getOrGenerateOperationId(parent.getRight(), parent.getMiddle(), parent.getLeft().name().toLowerCase(Locale.ROOT));
                 res.datatypeWithEnum = res.enumName + "_" + orGenerateOperationId;
             }
         }
