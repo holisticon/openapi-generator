@@ -11,6 +11,22 @@
   {{#isNumeric}}
     {{dataType}}.parse(it)
   {{/isNumeric}}
+  {{#isInteger}}
+      it.toInt()
+  {{/isInteger}}
+  {{#isBoolean}}
+      it.toBoolean()
+  {{/isBoolean}}
+  {{#isLong}}
+      it.toLong()
+  {{/isLong}}
+  {{#isDouble}}
+      it.toDouble()
+  {{/isDouble}}
+  {{#isFloat}}
+      it.toFloat()
+  {{/isFloat}}
+  {{#dump}}{{/dump}}
   {{#hiddenEnum}}
     {{>smartDataType}}.valueOf(it){{#debug}}hiddenEnum{{/debug}}
   {{/hiddenEnum}}
