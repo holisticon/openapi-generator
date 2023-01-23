@@ -28,13 +28,14 @@ class CompilationTest : FreeSpec() {
 
 
     // generate spring for code. just used for debugging
-    "regression spring".config(enabled = false) - {
+    "regression spring".config(false) - {
       withData(
         listOf(
-          "3248-regression",
-          "3248-regression-ref-lvl0",
-          "3248-regression-ref-lvl1",
-          "3248-regression-dates"
+          "issue_3248"
+//          "3248-regression",
+//          "3248-regression-ref-lvl0",
+//          "3248-regression-ref-lvl1",
+//          "3248-regression-dates"
         )
       ) { filename ->
         val openapiFile = openApiFiles30 / "$filename.yaml"
@@ -47,14 +48,14 @@ class CompilationTest : FreeSpec() {
     }
 
 
-    "regression 3.0" - {
+    "regression 3.0" - { // 77 F : 119 P
       testTraverse(File(openApiFiles30)) { file ->
         generateOpenApi(openapiFile = file.absolutePath, to = testOut)
         val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
         withClue("From ${file.absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
       }
     }
-    "regression 3.1" - {
+    "regression 3.1" - { // 2 F
       testTraverse(File(openApiFiles31)) { file ->
         generateOpenApi(openapiFile = file.absolutePath, to = testOut)
         val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
@@ -63,16 +64,17 @@ class CompilationTest : FreeSpec() {
     }
 
     // used to manually call individual tests
-    "!regression" - {
+    "regression".config(false) - {
       withData(
         listOf(
-          "3134-regression",
-          "3248-regression",
-          "3248-regression-required",
-          "3248-regression-required-no-default",
-          "3248-regression-ref-lvl0",
-          "3248-regression-ref-lvl1",
-          "3248-regression-dates"
+          "issue_3248",
+//          "3134-regression",
+//          "3248-regression",
+//          "3248-regression-required",
+//          "3248-regression-required-no-default",
+//          "3248-regression-ref-lvl0",
+//          "3248-regression-ref-lvl1",
+//          "3248-regression-dates"
         )
 
       ) { filename ->
