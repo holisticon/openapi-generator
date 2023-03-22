@@ -26,6 +26,17 @@ class CompilationTest : FreeSpec() {
     val openApiFiles30 = openApiFiles / "3_0"
     val openApiFiles31 = openApiFiles / "3_1"
 
+    "focus" {
+      val openapiFile = openApiFiles30 / "aspnetcore" / "petstore.yaml"
+      println("From: ${File(openapiFile).absoluteFile}")
+      generateOpenApi(openapiFile = openapiFile, to = "target" / "generated-sources2")
+
+      val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
+
+      withClue("From ${File(openapiFile).absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
+
+    }
+
 
     // generate spring for code. just used for debugging
     "regression spring".config(false) - {
@@ -88,17 +99,21 @@ class CompilationTest : FreeSpec() {
     }
   }
 
-  suspend fun ContainerScope.testTraverse(input: File, extensionFilter: Set<String> = setOf("yaml", "yml"), testFun: TestScope.(File) -> Unit) {
+  suspend fun ContainerScope.testTraverse(
+    input: File,
+    extensionFilter: Set<String> = setOf("yaml", "yml"),
+    testFun: TestScope.(File) -> Unit
+  ) {
     val content = input.listFiles()!!.toList().filterNotNull()
     val (dirs, files) = content
-      .filter { it.isDirectory || (it.isFile && extensionFilter.contains(it.extension))}
+      .filter { it.isDirectory || (it.isFile && extensionFilter.contains(it.extension)) }
       .partition { f -> f.isDirectory }
     dirs.sortedBy { d -> d.name }.forEach { d ->
       registerContainer(TestName(d.name), false, null) {
         FreeSpecContainerScope(this).testTraverse(d, extensionFilter, testFun)
       }
     }
-    files.sortedBy { it.name }.map{ it.absoluteFile }.forEach { f ->
+    files.sortedBy { it.name }.map { it.absoluteFile }.forEach { f ->
       registerTest(TestName(f.name), false, null) {
         this.testFun(f)
       }

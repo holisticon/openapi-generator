@@ -28,9 +28,15 @@
   {{/isFloat}}
   {{#dump}}{{/dump}}
   {{#hiddenEnum}}
+    {{#debug}}a hidden enum{{/debug}}
     {{>smartDataType}}.valueOf(it){{#debug}}hiddenEnum{{/debug}}
   {{/hiddenEnum}}
-  {{#debug}}data type matching in parseQueryParameter {{/debug}}
+  {{^hiddenEnum}}
+      {{#debug}}not a hidden enum{{/debug}}
+  {{/hiddenEnum}}
+  {{#schema}}{{#isModel}}
+      TODO() /* no object support in query parameters */
+  {{/isModel}}{{/schema}}
   }
 {{/trim1L}}{{/isString}}
 {{#isEnum}}{{! nested enums are strings as base type }}

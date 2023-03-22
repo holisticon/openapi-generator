@@ -21,12 +21,12 @@
     <maven.compiler.target>8</maven.compiler.target>
     <java.version>8</java.version>
 
-    <kotlin.version>1.7.10</kotlin.version>
+    <kotlin.version>1.8.10</kotlin.version>
     <azure.functions.maven.plugin.version>1.19.0</azure.functions.maven.plugin.version>
-    <azure.functions.java.library.version>2.0.1</azure.functions.java.library.version>
-    <kotest.version>5.4.1</kotest.version>
+    <azure.functions.java.library.version>3.0.0</azure.functions.java.library.version>
+    <kotest.version>5.5.5</kotest.version>
     <kotest-assertions-compiler.version>1.0.0</kotest-assertions-compiler.version>
-    <junit.version>5.9.0</junit.version>
+    <junit5.version>5.9.1</junit5.version>
   </properties>
 
   <dependencies>
@@ -52,17 +52,10 @@
     <dependency>
       <groupId>io.github.microutils</groupId>
       <artifactId>kotlin-logging-jvm</artifactId>
-      <version>2.1.21</version>
+      <version>3.0.5</version>
     </dependency>
 
     <!-- Test -->
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>5.8.2</version>
-      <scope>test</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-test</artifactId>
@@ -121,7 +114,7 @@
     <dependency>
       <groupId>com.github.tschuchortdev</groupId>
       <artifactId>kotlin-compile-testing</artifactId>
-      <version>1.4.9</version>
+      <version>1.5.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -129,14 +122,20 @@
     <!-- jUnit -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit5.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>${junit.version}</version>
+      <version>${junit5.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit.version}</version>
+      <version>${junit5.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
