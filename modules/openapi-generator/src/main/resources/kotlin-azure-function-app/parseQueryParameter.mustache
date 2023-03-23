@@ -38,10 +38,10 @@
 {{/trim1L}}{{/isString}}
 {{#isEnum}}{{! nested enums are strings as base type }}
     {{#debug}}non string enum{{/debug}}
-    ?.let<_ ,{{datatypeWithEnum}}?>{
+    ?.let<_ ,{{datatypeWithEnum}}?>{ {{#trim1L}}
     {{#isArray}}TODO()/* array of enums */{{/isArray}}
     {{^isArray}}{{datatypeWithEnum}}.values().find { v -> v.value == it }{{/isArray}}
-    }
+    {{/trim1L}} }
 {{/isEnum}}
 {{#defaultValue}}
     {{#trim1L}}

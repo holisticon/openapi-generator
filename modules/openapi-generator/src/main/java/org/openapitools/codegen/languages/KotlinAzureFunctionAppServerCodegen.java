@@ -22,6 +22,8 @@ import org.apache.commons.text.CaseUtils;
 import org.openapitools.codegen.*;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -239,6 +241,40 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
             );
         };
 
+        final Mustache.InvertibleLambda bodyFormParam = new Mustache.InvertibleLambda() {
+            public void logic(Template.Fragment fragment, Writer writer, boolean match) throws IOException {
+                Object ctx;
+                CodegenParameter codegenParameter = null;
+                for (int i = 0; codegenParameter == null; i++) {
+                    try {
+                        ctx = fragment.context(i);
+                        if (ctx instanceof CodegenParameter)
+                            codegenParameter = ((CodegenParameter) ctx);
+                    } catch (NullPointerException e) {
+                        break;
+                    }
+                }
+                if (codegenParameter == null) {
+                    throw new IllegalStateException("could not determine CodegenProperty for noBodyFormParam");
+                } else {
+                    if ((codegenParameter.isFormParam && !codegenParameter.isQueryParam && !codegenParameter.isPathParam) == match){
+                        fragment.execute(fragment.context(), writer);
+                    }
+                }
+            }
+
+            @Override
+            public void execute(Template.Fragment frag, Writer out) throws IOException {
+                logic(frag, out, true);
+            }
+
+            @Override
+            public void executeInverse(Template.Fragment frag, Writer out) throws IOException {
+                logic(frag, out, false);
+            }
+        };
+
+
         final Mustache.Lambda enumDefaultValue = (fragment, writer) -> {
             Object ctx = fragment.context();
             CodegenProperty codegenParameter = null;
@@ -280,6 +316,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         additionalProperties.put("break", breakLambda);
         additionalProperties.put("genInterfaceImpl", genInterfaceImplLambda);
         additionalProperties.put("trim1L", trimToOneLine);
+        additionalProperties.put("bodyFormParam", bodyFormParam);
 //        additionalProperties.put("enumDefaultValue", enumDefaultValue);
     }
 

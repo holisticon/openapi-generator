@@ -25,11 +25,11 @@ interface {{classname}}Interface {
         {{>enum_nested}}
       {{/items}}
       {{/isEnum}}
-      {{^isEnum}}{{#debug}}Non Enum ignored array parameter named: {{baseName}} {{/debug}}{{/isEnum}}
+      {{^isEnum}}{{#debug}}TODO: Non Enum ignored array parameter named: {{baseName}} {{/debug}}{{/isEnum}}
     {{/isArray}}
     {{^isArray}}
       {{#isEnum}}{{>enum_nested}}{{/isEnum}}
-    {{^isEnum}}{{#debug}}filtered non-enum parameter named: {{baseName}} {{/debug}}{{/isEnum}}
+    {{^isEnum}}{{#debug}}TODO: filtered non-enum parameter named: {{baseName}} {{/debug}}{{/isEnum}}
     {{/isArray}}
   {{/removeEmptyLines}}{{/allParams}}{{/operation}}
   }
