@@ -1,0 +1,14 @@
+{{#debug}}enum.nested.mustache{{/debug}}
+{{! for CodegenProperty context}}
+/**
+* {{{description}}}
+* Values: {{#allowableValues}}{{#enumVars}}{{&name}}{{^-last}},{{/-last}}{{/enumVars}}{{/allowableValues}}
+*/
+{{#isDeprecated}}
+@Deprecated(message = "This enum is deprecated.")
+{{/isDeprecated}}
+enum class {{datatypeWithEnum}}(val value: {{dataType}}) {
+{{#allowableValues}}{{#enumVars}}
+    {{&name}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
+{{/enumVars}}{{/allowableValues}}
+}

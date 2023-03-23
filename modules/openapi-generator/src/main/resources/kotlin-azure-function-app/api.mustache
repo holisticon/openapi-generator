@@ -2,9 +2,11 @@ package {{package}}
 
 {{#debug}}api.mustache{{/debug}}
 
+{{#debug}}iterated imports{{/debug}}
 {{#imports}}import {{import}}
 {{/imports}}
 
+{{#debug}}manual imports{{/debug}}
 import kotlin.collections.List
 import kotlin.collections.Map
 
@@ -15,8 +17,15 @@ import com.microsoft.azure.functions.annotation.*
 
 import javax.naming.Binding
 
+{{#debug}}Companion imports{{/debug}}
 {{#operations}}{{#operation}}{{#allParams}}{{#isEnum}}
-import {{package}}.{{classname}}Interface.Companion.{{datatypeWithEnum}}
+  import {{package}}.{{classname}}Interface.Companion.{{enumName}}
+{{! use when above doesn't work
+isArray
+/isArray
+^isArray
+/isArray
+}} //import {{package}}.{{classname}}Interface.Companion.{{datatypeWithEnum}} // remove me later
 {{/isEnum}}{{/allParams}}{{/operation}}{{/operations}}
 
 {{#operations}}
