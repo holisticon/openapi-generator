@@ -27,7 +27,7 @@ class CompilationTest : FreeSpec() {
     val openApiFiles31 = openApiFiles / "3_1"
 
     "focus" {
-      val openapiFile = openApiFiles30 / "aspnetcore" / "petstore.yaml"
+      val openapiFile = openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml"
       println("From: ${File(openapiFile).absoluteFile}")
       generateOpenApi(openapiFile = openapiFile, to = "target" / "generated-sources")
 
