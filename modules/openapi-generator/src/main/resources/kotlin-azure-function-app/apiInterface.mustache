@@ -19,7 +19,7 @@ class {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api: {{classname}}Int
 
 interface {{classname}}Interface {
   companion object {
-  {{#operation}}{{#allParams}}
+  {{#operation}}{{#allParams}}{{#removeEmptyLines}}
     {{#isArray}}
       {{#isEnum}}{{#items}}
         {{>enum_nested}}
@@ -28,22 +28,10 @@ interface {{classname}}Interface {
       {{^isEnum}}{{#debug}}Non Enum ignored array parameter named: {{baseName}} {{/debug}}{{/isEnum}}
     {{/isArray}}
     {{^isArray}}
-      {{#isEnum}}
-      {{#dump}}{{/dump}}
-      {{#isDeprecated}}
-        @Deprecated(message = "This enum is deprecated.")
-      {{/isDeprecated}}
-      enum class {{datatypeWithEnum}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) {
-      {{#allowableValues}}
-        {{#enumVars}}
-          {{&name}}({{{value}}}){{^-last}},{{/-last}}
-        {{/enumVars}}
-      {{/allowableValues}}
-      }
-    {{/isEnum}}
-    {{^isEnum}}{{#debug}}Non Enum parameter named: {{baseName}} {{/debug}}{{/isEnum}}
+      {{#isEnum}}{{>enum_nested}}{{/isEnum}}
+    {{^isEnum}}{{#debug}}filtered non-enum parameter named: {{baseName}} {{/debug}}{{/isEnum}}
     {{/isArray}}
-  {{/allParams}}{{/operation}}
+  {{/removeEmptyLines}}{{/allParams}}{{/operation}}
   }
 
 {{#operation}}

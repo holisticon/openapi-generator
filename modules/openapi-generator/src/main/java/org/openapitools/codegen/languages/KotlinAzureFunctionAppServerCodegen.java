@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.samskivert.mustache.Mustache;
+import com.samskivert.mustache.Template;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.Operation;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Pair;
@@ -237,6 +239,33 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
             );
         };
 
+        final Mustache.Lambda enumDefaultValue = (fragment, writer) -> {
+            Object ctx = fragment.context();
+            CodegenProperty codegenParameter = null;
+            for (int i = 1; ctx != null && codegenParameter == null; i++) {
+                try {
+                    ctx = fragment.context(i);
+                    if (ctx instanceof CodegenParameter)
+                        codegenParameter = ((CodegenParameter) ctx).getSchema();
+                } catch (NullPointerException e) {
+                    ctx = null;
+                }
+            }
+            if (codegenParameter == null) {
+                throw new IllegalStateException("could not determine CodegenProperty for enum");
+            } else {
+                String defV = codegenParameter.defaultValue;
+                if (defV != null) {
+                    Object properDefaultValue = codegenParameter.allowableValues.get(defV);
+                    if (properDefaultValue != null)
+                        fragment.execute(properDefaultValue, writer);
+                    else
+                        throw new IllegalStateException("Could not determine proper enum default value" + StringUtils.join(codegenParameter.allowableValues));
+                } else
+                    throw new IllegalStateException("No default present for" + codegenParameter.name);
+            }
+        };
+
         additionalProperties.put("removeApiSuffix", removeApiSuffix);
         additionalProperties.put("formatPath", formatPath);
         additionalProperties.put("upperFirstLetter", upperFirstLetter);
@@ -251,6 +280,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         additionalProperties.put("break", breakLambda);
         additionalProperties.put("genInterfaceImpl", genInterfaceImplLambda);
         additionalProperties.put("trim1L", trimToOneLine);
+//        additionalProperties.put("enumDefaultValue", enumDefaultValue);
     }
 
     boolean mustacheDebug = false;

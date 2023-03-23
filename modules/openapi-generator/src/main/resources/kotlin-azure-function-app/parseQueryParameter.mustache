@@ -26,7 +26,6 @@
   {{#isFloat}}
       it.toFloat()
   {{/isFloat}}
-  {{#dump}}{{/dump}}
   {{#hiddenEnum}}
     {{#debug}}a hidden enum{{/debug}}
     {{>smartDataType}}.valueOf(it){{#debug}}hiddenEnum{{/debug}}
@@ -38,24 +37,26 @@
   }
 {{/trim1L}}{{/isString}}
 {{#isEnum}}{{! nested enums are strings as base type }}
-    {{#debug}}isEnum{{/debug}}
-    ?.let<_ ,{{datatypeWithEnum}}>{
+    {{#debug}}non string enum{{/debug}}
+    ?.let<_ ,{{datatypeWithEnum}}?>{
     {{#isArray}}TODO()/* array of enums */{{/isArray}}
-    {{^isArray}}{{datatypeWithEnum}}.valueOf(it){{/isArray}}
+    {{^isArray}}{{datatypeWithEnum}}.values().find { v -> v.value == it }{{/isArray}}
     }
 {{/isEnum}}
 {{#defaultValue}}
     {{#trim1L}}
     ?:
     {{#isEnum}}
-        {{>smartDataType}}.{{#debug}}defaultValue.isEnum{{/debug}}
+      {{#getSchema}}{{defaultValue}}{{/getSchema}}{{#debug}}defaultValue.isEnum{{/debug}}
     {{/isEnum}}
     {{#hiddenEnum}}
-        {{>smartDataType}}.{{#debug}}hiddenEnum{{/debug}}
+      {{#getSchema}}{{defaultValue}}{{/getSchema}}{{#debug}}hiddenEnum{{/debug}}
     {{/hiddenEnum}}
     {{#enum}}
-        {{>smartDataType}}.{{#debug}}enum{{/debug}}
+      {{#getSchema}}{{defaultValue}}{{/getSchema}}{{#debug}}enum{{/debug}}
     {{/enum}}
-    {{defaultValue}}{{#debug}}set default value{{/debug}}
+      {{^enum}}{{^isEnum}}{{^hiddenEnum}}
+        {{defaultValue}}{{#debug}}set default value{{/debug}}
+      {{/hiddenEnum}}{{/isEnum}}{{/enum}}
     {{/trim1L}}
 {{/defaultValue}}
