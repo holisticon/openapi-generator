@@ -29,7 +29,7 @@ class CompilationTest : FreeSpec() {
     "focus" {
       val openapiFile = openApiFiles30 / "aspnetcore" / "petstore.yaml"
       println("From: ${File(openapiFile).absoluteFile}")
-      generateOpenApi(openapiFile = openapiFile, to = "target" / "generated-sources2")
+      generateOpenApi(openapiFile = openapiFile, to = "target" / "generated-sources")
 
       val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
 

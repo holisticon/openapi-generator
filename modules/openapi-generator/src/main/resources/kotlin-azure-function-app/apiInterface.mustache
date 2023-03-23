@@ -19,8 +19,16 @@ class {{#removeApiSuffix}}{{classname}}{{/removeApiSuffix}}Api: {{classname}}Int
 
 interface {{classname}}Interface {
   companion object {
-  {{#allParams}}
-    {{#isEnum}}
+  {{#operation}}{{#allParams}}
+    {{#isArray}}
+      {{#isEnum}}{{#items}}
+        {{>enum_nested}}
+      {{/items}}
+      {{/isEnum}}
+      {{^isEnum}}{{#debug}}Non Enum ignored array parameter named: {{baseName}} {{/debug}}{{/isEnum}}
+    {{/isArray}}
+    {{^isArray}}
+      {{#isEnum}}
       {{#dump}}{{/dump}}
       {{#isDeprecated}}
         @Deprecated(message = "This enum is deprecated.")
@@ -33,10 +41,12 @@ interface {{classname}}Interface {
       {{/allowableValues}}
       }
     {{/isEnum}}
-  {{/allParams}}
+    {{^isEnum}}{{#debug}}Non Enum parameter named: {{baseName}} {{/debug}}{{/isEnum}}
+    {{/isArray}}
+  {{/allParams}}{{/operation}}
   }
-{{#operation}}
 
+{{#operation}}
   fun {{operationId}}(
     {{#removeEmptyLines}}{{#lambda.indented}}{{>interfaceMethodParams}}{{/lambda.indented}}{{/removeEmptyLines}}
   ): {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result {
