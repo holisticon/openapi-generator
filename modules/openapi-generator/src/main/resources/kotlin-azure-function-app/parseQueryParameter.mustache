@@ -31,22 +31,24 @@
     {{#debug}}a hidden enum{{/debug}}
     {{>smartDataType}}.valueOf(it){{#debug}}hiddenEnum{{/debug}}
   {{/hiddenEnum}}
-  {{^hiddenEnum}}
-      {{#debug}}not a hidden enum{{/debug}}
-  {{/hiddenEnum}}
   {{#schema}}{{#isModel}}
       TODO() /* no object support in query parameters */
   {{/isModel}}{{/schema}}
+  {{#isArray}}TODO()/* array of strings */{{/isArray}}
   }
 {{/trim1L}}{{/isString}}
 {{#isEnum}}{{! nested enums are strings as base type }}
-    ?.let { {{datatypeWithEnum}}.valueOf(it) }{{#debug}}isEnum{{/debug}}{{#dump}}{{/dump}}
+    {{#debug}}isEnum{{/debug}}
+    ?.let<_ ,{{datatypeWithEnum}}>{
+    {{#isArray}}TODO()/* array of enums */{{/isArray}}
+    {{^isArray}}{{datatypeWithEnum}}.valueOf(it){{/isArray}}
+    }
 {{/isEnum}}
 {{#defaultValue}}
     {{#trim1L}}
     ?:
     {{#isEnum}}
-        {{>smartDataType}}.{{#debug}}isEnum{{/debug}}
+        {{>smartDataType}}.{{#debug}}defaultValue.isEnum{{/debug}}
     {{/isEnum}}
     {{#hiddenEnum}}
         {{>smartDataType}}.{{#debug}}hiddenEnum{{/debug}}
