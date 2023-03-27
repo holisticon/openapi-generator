@@ -17,7 +17,7 @@ data class {{classname}}(
 {{/-last}}{{/requiredVars}}{{#hasRequired}}{{#hasOptional}},
 {{/hasOptional}}{{/hasRequired}}{{#optionalVars}}{{>data_class_opt_var}}{{^-last}},
 {{/-last}}{{/optionalVars}}
-) {{^serializableModel}}{{/serializableModel}}{{#serializableModel}}: Serializable {{/serializableModel}}
+) {{^serializableModel}}{{/serializableModel}}{{#serializableModel}}: Serializable {{/serializableModel}}{{#debug}} data class from {{name}}/{{classFilename}}{{/debug}}{{#dump}}{{/dump}}
 {{#vendorExtensions.x-has-data-class-body}}
 {
 {{/vendorExtensions.x-has-data-class-body}}
@@ -33,10 +33,14 @@ data class {{classname}}(
     * {{{description}}}
     * Values: {{#allowableValues}}{{#enumVars}}{{&name}}{{^-last}},{{/-last}}{{/enumVars}}{{/allowableValues}}
     */
-    enum class {{nameInCamelCase}}(val value: {{dataType}}){
+    enum class {{nameInCamelCase}}(val value: {{#trim1L}}
+    {{#isArray}}{{#items}}{{dataType}}{{/items}}{{/isArray}}{{^isArray}}
+    {{#isMap}}{{#items}}{{dataType}}{{/items}}{{/isMap}}
+    {{^isMap}}{{dataType}}{{/isMap}}{{/isArray}}
+    {{/trim1L}}){ {{#debug}}data_class enum{{/debug}}
     {{#allowableValues}}
     {{#enumVars}}
-        {{&name}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
+      {{#orEMPTY}}{{&name}}{{/orEMPTY}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
     {{/enumVars}}
     {{/allowableValues}}
     }

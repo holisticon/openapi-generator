@@ -50,6 +50,7 @@ interface {{classname}}Interface {
     companion object {
     {{#responses}}
       {{#content}}
+        {{#debug}}response with content{{/debug}}
         {{# ContentTypeMap }}
       fun respond{{^isDefault}}{{code}}{{/isDefault}}{{^isUnique}}{{contentTypeShortName}}{{/isUnique}}({{#isDefault}}status: HttpStatusType, {{/isDefault}}{{#dataType}}result: {{dataType}}, {{/dataType}}headers: Map<String, String> = mapOf()): {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result {
         return {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result({{#isDefault}}status{{/isDefault}}{{^isDefault}}status = HttpStatusType.custom({{code}}){{/isDefault}}, headers = headers{{#dataType}}, body = result{{/dataType}}{{#hasContentType}}, contentType = "{{key}}"{{/hasContentType}});
@@ -57,6 +58,7 @@ interface {{classname}}Interface {
         {{/ContentTypeMap}}
       {{/content}}
       {{^content}}
+        {{#debug}}response without content{{/debug}}
       fun respond{{^isDefault}}{{code}}{{/isDefault}}({{#isDefault}}status: HttpStatusType, {{/isDefault}}headers: Map<String, String> = mapOf()): {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result {
         return {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result({{#isDefault}}status{{/isDefault}}{{^isDefault}}status = HttpStatusType.custom({{code}}){{/isDefault}}, headers = headers);
       }

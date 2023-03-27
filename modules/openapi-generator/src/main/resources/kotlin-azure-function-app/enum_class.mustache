@@ -5,8 +5,11 @@
 {{#isDeprecated}}
 @Deprecated(message = "This enum is deprecated.")
 {{/isDeprecated}}
-enum class {{classname}}(val value: {{dataType}}) {
+enum class {{classname}}(val value:
+{{^isArray}}{{dataType}}{{/isArray}}
+{{#isArray}}{{#items}}{{dataType}}{{/items}}{{/isArray}}
+) { {{#debug}}enum_class enum{{/debug}}
 {{#allowableValues}}{{#enumVars}}
-    {{&name}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
+  {{#orEMPTY}}{{&name}}{{/orEMPTY}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
 {{/enumVars}}{{/allowableValues}}
 }
