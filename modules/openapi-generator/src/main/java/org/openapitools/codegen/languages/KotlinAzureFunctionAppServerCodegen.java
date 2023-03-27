@@ -180,7 +180,14 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
             public String contentTypeShortName() {
                 int shortNameIndex = key.lastIndexOf("/");
                 String shortName = key.substring(shortNameIndex + 1);
-                return CaseUtils.toCamelCase(shortName, true, '-', '_');
+
+                int[] specialChars = specialCharReplacements.keySet().stream().filter(k -> k.length() == 1).<Character>map(k -> k.charAt(0))
+                        .mapToInt(Character::charValue).toArray();
+                char[] sC = new char[specialChars.length];
+                for (int i = 0; i < specialChars.length; i++) {
+                    sC[i] = (char) specialChars[i];
+                }
+                return CaseUtils.toCamelCase(shortName, true, sC);
             }
         }
         final Mustache.Lambda contentTypeMap =
@@ -241,6 +248,14 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
             );
         };
 
+        final Mustache.Lambda orEmpty = (fragment, writer) -> {
+            String res = fragment.execute();
+            if(res.isEmpty()) {
+                res = "EMPTY";
+            }
+            writer.write(res);
+        };
+
         final Mustache.InvertibleLambda bodyFormParam = new Mustache.InvertibleLambda() {
             public void logic(Template.Fragment fragment, Writer writer, boolean match) throws IOException {
                 Object ctx;
@@ -257,7 +272,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
                 if (codegenParameter == null) {
                     throw new IllegalStateException("could not determine CodegenProperty for noBodyFormParam");
                 } else {
-                    if ((codegenParameter.isFormParam && !codegenParameter.isQueryParam && !codegenParameter.isPathParam) == match){
+                    if ((codegenParameter.isFormParam && !codegenParameter.isQueryParam && !codegenParameter.isPathParam) == match) {
                         fragment.execute(fragment.context(), writer);
                     }
                 }
@@ -317,6 +332,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         additionalProperties.put("genInterfaceImpl", genInterfaceImplLambda);
         additionalProperties.put("trim1L", trimToOneLine);
         additionalProperties.put("bodyFormParam", bodyFormParam);
+        additionalProperties.put("orEMPTY", orEmpty);
 //        additionalProperties.put("enumDefaultValue", enumDefaultValue);
     }
 

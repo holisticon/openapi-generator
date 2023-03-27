@@ -7,8 +7,8 @@
 {{#isDeprecated}}
 @Deprecated(message = "This enum is deprecated.")
 {{/isDeprecated}}
-enum class {{datatypeWithEnum}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) { {{#debug}}for {{baseName}}{{/debug}}
+enum class {{datatypeWithEnum}}(val value: {{^isContainer}}{{dataType}}{{/isContainer}}{{#isContainer}}kotlin.String{{/isContainer}}) { {{#debug}}enum class nested for {{baseName}}{{/debug}}
 {{#allowableValues}}{{#enumVars}}
-    {{&name}}({{{value}}}){{^-last}},{{/-last}}
+  {{#orEMPTY}}{{&name}}{{/orEMPTY}}({{{value}}}){{^-last}},{{/-last}}
 {{/enumVars}}{{/allowableValues}}
 }

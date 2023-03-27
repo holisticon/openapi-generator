@@ -29,7 +29,12 @@ class CompilationTest : FreeSpec() {
     "focus" {
       val openapiFile = openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml"
       println("From: ${File(openapiFile).absoluteFile}")
-      generateOpenApi(openapiFile = openapiFile, to = "target" / "generated-sources")
+      generateOpenApi(
+        openapiFile = openapiFile, to = "target" / "generated-sources",
+        generator = CompilationTestHelper.kotlinAzureServerCodegen(null, "target" / "generated-sources").also {
+          it.importMapping().remove("File")
+        }
+      )
 
       val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
 
