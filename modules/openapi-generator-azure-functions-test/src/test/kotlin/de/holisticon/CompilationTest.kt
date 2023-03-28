@@ -32,10 +32,11 @@ class CompilationTest : FreeSpec() {
       val openapiFile = openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
-        openapiFile = openapiFile, to = "target" / "generated-sources2",
-        generator = CompilationTestHelper.kotlinAzureServerCodegen(null, "target" / "generated-sources2").also {
+        openapiFile = openapiFile, to = "target" / "generated-sources",
+        generator = CompilationTestHelper.kotlinAzureServerCodegen(null, "target" / "generated-sources").also {
           it.importMapping().remove("File")
-        }
+        },
+        codeGenConfigMod = { modCodegenConfig(it, openapiFile) }
       )
 
       val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
@@ -65,13 +66,7 @@ class CompilationTest : FreeSpec() {
       }
     }
 
-    fun modCodegenConfig(c: CodegenConfig, filePath: String) {
-      when (filePath) {
-        // remove File -> java.io.File mapping for this test
-        (openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath ->
-          c.importMapping().remove("File")
-      }
-    }
+
     "regression 3.0" - { // 77 F : 119 P
       testTraverse(File(openApiFiles30)) { file ->
         generateOpenApi(openapiFile = file.absolutePath, to = testOut, codeGenConfigMod = { modCodegenConfig(it, file.absolutePath) })
@@ -129,6 +124,16 @@ class CompilationTest : FreeSpec() {
     files.sortedBy { it.name }.map { it.absoluteFile }.forEach { f ->
       registerTest(TestName(f.name), false, null) {
         this.testFun(f)
+      }
+    }
+  }
+
+  private fun modCodegenConfig(c: CodegenConfig, filePath: String) {
+    when (filePath.absPath) {
+      (openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath -> {
+        c.importMapping().remove("File") // remove File -> java.io.File mapping for this test
+        c.importMapping().put("UnsignedInteger", "java.lang.Long") // map to Long
+        c.importMapping().put("UnsignedLong", "java.lang.Long")
       }
     }
   }

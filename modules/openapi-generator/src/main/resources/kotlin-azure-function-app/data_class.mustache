@@ -1,6 +1,10 @@
+{{#debug}}data_class.mustache{{/debug}}
+
 {{#serializableModel}}
+{{#debug}}serializableModel import{{/debug}}
 import java.io.Serializable
 {{/serializableModel}}
+
 /**
  * {{{description}}}
 {{#vars}}
@@ -10,13 +14,18 @@ import java.io.Serializable
 {{#isDeprecated}}
 @Deprecated(message = "This data class is deprecated.")
 {{/isDeprecated}}
+{{#isEmptyVars}}
+interface {{classname}}
+{{/isEmptyVars}}
+
+{{^isEmptyVars}}
 data class {{classname}}(
 {{#requiredVars}}
 {{>data_class_req_var}}{{^-last}},
 {{/-last}}{{/requiredVars}}{{#hasRequired}}{{#hasOptional}},
 {{/hasOptional}}{{/hasRequired}}{{#optionalVars}}{{>data_class_opt_var}}{{^-last}},
 {{/-last}}{{/optionalVars}}
-) {{^serializableModel}}{{/serializableModel}}{{#serializableModel}}: Serializable {{/serializableModel}}{{#debug}} data class from {{name}}/{{classFilename}}{{/debug}}{{#dump}}{{/dump}}
+) {{^serializableModel}}{{/serializableModel}}{{#serializableModel}}: Serializable {{/serializableModel}}{{#debug}} data class from {{name}}/{{classFilename}}{{/debug}}
 {{#vendorExtensions.x-has-data-class-body}}
 {
 {{/vendorExtensions.x-has-data-class-body}}
@@ -49,3 +58,4 @@ data class {{classname}}(
 {{#vendorExtensions.x-has-data-class-body}}
 }
 {{/vendorExtensions.x-has-data-class-body}}
+{{/isEmptyVars}}

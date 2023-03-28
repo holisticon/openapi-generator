@@ -1,5 +1,11 @@
 {{! in CodegenParameter }}
-{{^isString}}{{#trim1L}}
+{{#isUuid}}
+  ?.let{
+    {{dataType}}.fromString(it)
+  }
+{{/isUuid}}
+
+{{^isUuid}}{{^isString}}{{#trim1L}}
   ?.let {
   {{#debug}}parse non string query parameter{{/debug}}
   {{#isDate}}
@@ -35,7 +41,8 @@
   {{/isModel}}{{/schema}}
   {{#isArray}}TODO()/* array of strings */{{/isArray}}
   }
-{{/trim1L}}{{/isString}}
+{{/trim1L}}{{/isString}}{{/isUuid}}
+
 {{#isEnum}}{{! nested enums are strings as base type }}
     {{#debug}}non string enum{{/debug}}
     ?.let<_ ,{{datatypeWithEnum}}?>{ {{#trim1L}}
@@ -43,6 +50,7 @@
     {{^isArray}}{{datatypeWithEnum}}.values().find { v -> v.value == it }{{/isArray}}
     {{/trim1L}} }
 {{/isEnum}}
+
 {{#defaultValue}}
     {{#trim1L}}
     ?:

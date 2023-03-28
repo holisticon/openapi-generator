@@ -1,7 +1,8 @@
+{{#debug}}model.mustache{{/debug}}
 {{>licenseInfo}}
 package {{modelPackage}}
 
-{{#imports}}import {{import}}
+{{#imports}}{{#debug}}imports import{{/debug}}import {{import}}
 {{/imports}}
 
 {{#models}}
