@@ -1,6 +1,7 @@
 package de.holisticon
 
 import com.tschuchort.compiletesting.KotlinCompilation.ExitCode.OK
+import de.holisticon.CompilationTestHelper.absPath
 import de.holisticon.CompilationTestHelper.compile
 import de.holisticon.CompilationTestHelper.div
 import de.holisticon.CompilationTestHelper.generateOpenApi
@@ -13,6 +14,7 @@ import io.kotest.core.spec.style.scopes.*
 import io.kotest.core.test.TestScope
 import io.kotest.datatest.withData
 import io.kotest.matchers.comparables.shouldBeEqualComparingTo
+import org.openapitools.codegen.CodegenConfig
 import org.openapitools.codegen.languages.KotlinSpringServerCodegen
 import java.io.File
 
@@ -21,24 +23,24 @@ class CompilationTest : FreeSpec() {
     to?.let { cfg.outputDir = it }
   }
 
-  init {
-    val openApiFiles = ".." / "openapi-generator" / "src" / "test" / "resources"
-    val openApiFiles30 = openApiFiles / "3_0"
-    val openApiFiles31 = openApiFiles / "3_1"
+  private val openApiFiles = ".." / "openapi-generator" / "src" / "test" / "resources"
+  private val openApiFiles30 = openApiFiles / "3_0"
+  private val openApiFiles31 = openApiFiles / "3_1"
 
+  init {
     "focus" {
       val openapiFile = openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml"
-      println("From: ${File(openapiFile).absoluteFile}")
+      println("From: ${openapiFile.absPath}")
       generateOpenApi(
-        openapiFile = openapiFile, to = "target" / "generated-sources",
-        generator = CompilationTestHelper.kotlinAzureServerCodegen(null, "target" / "generated-sources").also {
+        openapiFile = openapiFile, to = "target" / "generated-sources2",
+        generator = CompilationTestHelper.kotlinAzureServerCodegen(null, "target" / "generated-sources2").also {
           it.importMapping().remove("File")
         }
       )
 
       val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
 
-      withClue("From ${File(openapiFile).absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
+      withClue("From ${openapiFile.absPath}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
 
     }
 
@@ -59,14 +61,20 @@ class CompilationTest : FreeSpec() {
 
         val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
 
-        withClue("From ${File(openapiFile).absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
+        withClue("From ${openapiFile.absPath}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
       }
     }
 
-
+    fun modCodegenConfig(c: CodegenConfig, filePath: String) {
+      when (filePath) {
+        // remove File -> java.io.File mapping for this test
+        (openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath ->
+          c.importMapping().remove("File")
+      }
+    }
     "regression 3.0" - { // 77 F : 119 P
       testTraverse(File(openApiFiles30)) { file ->
-        generateOpenApi(openapiFile = file.absolutePath, to = testOut)
+        generateOpenApi(openapiFile = file.absolutePath, to = testOut, codeGenConfigMod = { modCodegenConfig(it, file.absolutePath) })
         val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
         withClue("From ${file.absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
       }
