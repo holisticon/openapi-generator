@@ -52,11 +52,12 @@ object CompilationTestHelper {
     openapiFile: String,
     to: String?,
     extensionModelInputFile: String? = null,
-    generator: CodegenConfig = kotlinAzureServerCodegen(extensionModelInputFile, to)
+    generator: CodegenConfig = kotlinAzureServerCodegen(extensionModelInputFile, to),
+    codeGenConfigMod: (CodegenConfig) -> Unit = {}
   ) {
     val options = ClientOptInput().apply {
       openAPI(parseSpec(openapiFile))
-      config(generator)
+      config(generator.apply { codeGenConfigMod(this) })
     }
     DefaultGenerator().opts(options).generate()
   }
@@ -84,4 +85,8 @@ object CompilationTestHelper {
     get() = "target" / "compile-test-generated-sources" / "${this.parentPath}${this.testCase.name.testName.pathReady}"
 
   operator fun String.div(other: String) = this + File.separator + other
+
+  val String.absPath: String
+    get() = File(this).absoluteFile.toString()
+
 }
