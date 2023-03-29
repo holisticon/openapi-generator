@@ -51,11 +51,25 @@ interface {{classname}}Interface {
     {{#responses}}
       {{#content}}
         {{#debug}}response with content{{/debug}}
-        {{# ContentTypeMap }}
-      fun respond{{^isDefault}}{{code}}{{/isDefault}}{{^isUnique}}{{contentTypeShortName}}{{/isUnique}}({{#isDefault}}status: HttpStatusType, {{/isDefault}}{{#dataType}}result: {{dataType}}, {{/dataType}}headers: Map<String, String> = mapOf()): {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result {
-        return {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result({{#isDefault}}status{{/isDefault}}{{^isDefault}}status = HttpStatusType.custom({{code}}){{/isDefault}}, headers = headers{{#dataType}}, body = result{{/dataType}}{{#hasContentType}}, contentType = "{{key}}"{{/hasContentType}});
-      }
-        {{/ContentTypeMap}}
+      {{# ContentTypeMap }}
+
+      {{#trim1L}}
+          fun respond{{^isDefault}}{{code}}{{/isDefault}}
+        {{^isUnique}}{{contentTypeShortName}}{{/isUnique}}
+      (
+        {{#needsExplicitHttpCode}}status: HttpStatusType, {{/needsExplicitHttpCode}}
+        {{#dataType}}result: {{dataType}}, {{/dataType}}headers: Map<String, String> = mapOf()
+      ): {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result =
+      {{/trim1L}}
+      {{#trim1L}}
+        {{#upperFirstLetter}}{{operationId}}{{/upperFirstLetter}}Result
+        (
+        {{#needsExplicitHttpCode}}status{{/needsExplicitHttpCode}}
+        {{^needsExplicitHttpCode}}status = HttpStatusType.custom({{code}}){{/needsExplicitHttpCode}}
+        ,headers = headers{{#dataType}}, body = result{{/dataType}}{{#hasContentType}}, contentType = "{{key}}"{{/hasContentType}}
+        );
+      {{/trim1L}}
+      {{/ContentTypeMap}}
       {{/content}}
       {{^content}}
         {{#debug}}response without content{{/debug}}

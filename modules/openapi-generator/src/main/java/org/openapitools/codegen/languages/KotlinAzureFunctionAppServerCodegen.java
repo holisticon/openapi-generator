@@ -292,6 +292,31 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
             }
         };
 
+        final Mustache.InvertibleLambda needsExplicitHttpCode = new Mustache.InvertibleLambda() {
+            public void logic(Template.Fragment fragment, Writer writer, boolean match) throws IOException {
+                CodegenResponse codegenResponse = null;
+                for(int i = 0; codegenResponse == null ;i++){
+                    Object ctx =fragment.context(i);
+                    if(ctx instanceof CodegenResponse){
+                        codegenResponse = (CodegenResponse) ctx;
+                        break;
+                    }
+                }
+                if((codegenResponse.isRange() || codegenResponse.isWildcard() || codegenResponse.isDefault ) == match) {
+                    fragment.execute(fragment.context(), writer);
+                }
+            }
+
+            @Override
+            public void execute(Template.Fragment frag, Writer out) throws IOException {
+                logic(frag, out, true);
+            }
+
+            @Override
+            public void executeInverse(Template.Fragment frag, Writer out) throws IOException {
+                logic(frag, out, false);
+            }
+        };
 
         final Mustache.Lambda enumDefaultValue = (fragment, writer) -> {
             Object ctx = fragment.context();
@@ -336,6 +361,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         additionalProperties.put("trim1L", trimToOneLine);
         additionalProperties.put("bodyFormParam", bodyFormParam);
         additionalProperties.put("orEMPTY", orEmpty);
+        additionalProperties.put("needsExplicitHttpCode", needsExplicitHttpCode);
 //        additionalProperties.put("enumDefaultValue", enumDefaultValue);
     }
 

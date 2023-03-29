@@ -28,9 +28,8 @@ class CompilationTest : FreeSpec() {
   private val openApiFiles31 = openApiFiles / "3_1"
 
   init {
-    "focus".config(enabled = false) {
-
-      val openapiFile = openApiFiles30 / "csharp-netcore" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml"
+    "focus"{
+      val openapiFile = openApiFiles30 / "go" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",
@@ -145,14 +144,15 @@ class CompilationTest : FreeSpec() {
 
   private fun modCodegenConfig(c: CodegenConfig, filePath: String) {
     when (filePath.absPath) {
-
+      (openApiFiles30 / "go" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath -> {
+        c.removeFile()
+      }
       (openApiFiles30 / "csharp-netcore" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath -> {
         c.removeFile()
       }
 
       (openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath -> {
-        c.removeFile()
-          .addUnsigneds()
+        c.removeFile().addUnsigneds()
       }
 
       (openApiFiles30 / "unsigned-test.yaml").absPath -> {
