@@ -1,4 +1,13 @@
 {{#description}}
-    /* {{{.}}} */
+  /* {{{.}}} */
 {{/description}}
-    {{>modelMutable}} {{{name}}}: {{#isEnum}}{{classname}}.{{nameInCamelCase}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}? = {{{defaultValue}}}{{^defaultValue}}null{{/defaultValue}}
+{{>modelMutable}} {{{name}}}: {{#isEnum}}{{classname}}.{{nameInCamelCase}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}? =
+{{#trim1L}}
+  {{#isNumeric}}{{#defaultValue}}
+    {{dataType}}({{defaultValue}})
+  {{/defaultValue}}{{/isNumeric}}
+  {{^isNumeric}}
+    {{{defaultValue}}}
+  {{/isNumeric}}
+  {{^defaultValue}}null{{/defaultValue}}
+{{/trim1L}}

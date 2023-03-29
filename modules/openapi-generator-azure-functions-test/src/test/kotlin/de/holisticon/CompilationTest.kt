@@ -29,7 +29,7 @@ class CompilationTest : FreeSpec() {
 
   init {
     "focus"{
-      val openapiFile = openApiFiles30 / "go" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml"
+      val openapiFile = openApiFiles30 / "helidon" / "petstore-for-testing.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",
