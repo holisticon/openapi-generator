@@ -28,14 +28,13 @@ class CompilationTest : FreeSpec() {
   private val openApiFiles31 = openApiFiles / "3_1"
 
   init {
-    "focus" {
-      val openapiFile = openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml"
+    "focus".config(enabled = false) {
+
+      val openapiFile = openApiFiles30 / "csharp-netcore" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",
-        generator = CompilationTestHelper.kotlinAzureServerCodegen(null, "target" / "generated-sources").also {
-          it.importMapping().remove("File")
-        },
+        generator = CompilationTestHelper.kotlinAzureServerCodegen(null, "target" / "generated-sources"),
         codeGenConfigMod = { modCodegenConfig(it, openapiFile) }
       )
 
@@ -67,16 +66,16 @@ class CompilationTest : FreeSpec() {
     }
 
 
-    "regression 3.0" - { // 77 F : 119 P
+    "regression 3.0" - {
       testTraverse(File(openApiFiles30)) { file ->
         generateOpenApi(openapiFile = file.absolutePath, to = testOut, codeGenConfigMod = { modCodegenConfig(it, file.absolutePath) })
         val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
         withClue("From ${file.absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
       }
     }
-    "regression 3.1" - { // 2 F
+    "regression 3.1" - {
       testTraverse(File(openApiFiles31)) { file ->
-        generateOpenApi(openapiFile = file.absolutePath, to = testOut)
+        generateOpenApi(openapiFile = file.absolutePath, to = testOut, codeGenConfigMod = { modCodegenConfig(it, file.absolutePath) })
         val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
         withClue("From ${file.absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
       }
@@ -122,19 +121,44 @@ class CompilationTest : FreeSpec() {
       }
     }
     files.sortedBy { it.name }.map { it.absoluteFile }.forEach { f ->
-      registerTest(TestName(f.name), false, null) {
-        this.testFun(f)
+      registerTest(TestName(f.name), disabled = disableTestFilter(f.absolutePath), null) {
+        if (!disableTestFilter(f.absolutePath)) {
+          this.testFun(f)
+        }
       }
     }
   }
 
+  private fun CodegenConfig.removeFile(): CodegenConfig =
+    this.also { importMapping().remove("File") }// remove File -> java.io.File mapping for this test
+
+  private fun CodegenConfig.addUnsigneds(): CodegenConfig = run {
+    this.importMapping().put("UnsignedInteger", "java.lang.Long") // map to Long
+    this.importMapping().put("UnsignedLong", "java.lang.Long")
+    this
+  }
+
+  private fun disableTestFilter(filePath: String): Boolean = run {
+    false
+  }
+
+
   private fun modCodegenConfig(c: CodegenConfig, filePath: String) {
     when (filePath.absPath) {
-      (openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath -> {
-        c.importMapping().remove("File") // remove File -> java.io.File mapping for this test
-        c.importMapping().put("UnsignedInteger", "java.lang.Long") // map to Long
-        c.importMapping().put("UnsignedLong", "java.lang.Long")
+
+      (openApiFiles30 / "csharp-netcore" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath -> {
+        c.removeFile()
       }
+
+      (openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath -> {
+        c.removeFile()
+          .addUnsigneds()
+      }
+
+      (openApiFiles30 / "unsigned-test.yaml").absPath -> {
+        c.addUnsigneds()
+      }
+
     }
   }
 }

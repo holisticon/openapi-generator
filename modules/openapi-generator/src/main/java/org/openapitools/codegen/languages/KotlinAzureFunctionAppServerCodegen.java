@@ -35,6 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
+    {
+        this.propertyAdditionalKeywords.add("request"); // TODO test this
+    }
     private <T> Stream<T> toStream(Optional<T> o) {
         return o.map(Stream::of).orElse(Stream.empty());
     }
