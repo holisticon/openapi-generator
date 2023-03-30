@@ -1,13 +1,22 @@
 {{#description}}
   /* {{{.}}} */
 {{/description}}
-{{>modelMutable}} {{{name}}}: {{#isEnum}}{{classname}}.{{nameInCamelCase}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}? =
-{{#trim1L}}
+{{>modelMutable}} {{{name}}}: {{#isEnum}}{{classname}}.{{nameInCamelCase}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}? = {{#trim1L}}
+
   {{#isNumeric}}{{#defaultValue}}
+    {{#debug}}Numeric with default{{/debug}}
     {{dataType}}({{defaultValue}})
   {{/defaultValue}}{{/isNumeric}}
   {{^isNumeric}}
+
+  {{#isUuid}}{{#defaultValue}}
+    {{#debug}}uuid with default value{{/debug}}
+    {{dataType}}.fromString({{defaultValue}})
+  {{/defaultValue}}{{/isUuid}}
+
+  {{^isUuid}}
+  {{#debug}}non non uuid numeric{{/debug}}
     {{{defaultValue}}}
-  {{/isNumeric}}
+  {{/isUuid}}{{/isNumeric}}
   {{^defaultValue}}null{{/defaultValue}}
 {{/trim1L}}
