@@ -14,6 +14,12 @@ val {{paramName}}: {{datatypeWithEnum}}{{^datatypeWithEnum}}{{dataType}}{{/datat
 val {{paramName}} = request.headers["{{baseName}}"]{{>parseQueryParameter}}
 {{/headerParams}}
 
+// cookie parameter{{! ----------------------  cookieParams ----------------------}}
+{{#cookieParams}}
+  val {{paramName}} = TODO() /* implement how to handle cookie parameters */
+{{/cookieParams}}
+
+
 // required parameter validation
 val notSetRequiredParams = mutableSetOf<String>()
 {{#allParams}}{{^defaultValue}}{{#required}}

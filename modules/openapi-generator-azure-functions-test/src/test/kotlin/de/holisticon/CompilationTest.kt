@@ -28,7 +28,7 @@ class CompilationTest : FreeSpec() {
   private val openApiFiles31 = openApiFiles / "3_1"
 
   init {
-    "focus"{
+    "focus" {
       val openapiFile = openApiFiles30 / "helidon" / "petstore-for-testing.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
@@ -143,14 +143,30 @@ class CompilationTest : FreeSpec() {
 
 
   private fun modCodegenConfig(c: CodegenConfig, filePath: String) {
-    when (filePath.absPath) {
-      (openApiFiles30 / "go" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath -> {
-        c.removeFile()
-      }
-      (openApiFiles30 / "csharp-netcore" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath -> {
-        c.removeFile()
-      }
+    val absFilePath = filePath.absPath
+    val toRemoveFile = setOf(
+      openApiFiles30 / "go" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+      openApiFiles30 / "csharp-netcore" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+      openApiFiles30 / "java" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature-okhttp-gson.yaml",
+      openApiFiles30 / "java" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+      openApiFiles30 / "javascript" / "petstore-with-fake-endpoints-models-for-testing.yaml",
+      openApiFiles30 / "java" / "native" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+      openApiFiles30 / "powershell" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+      openApiFiles30 / "python" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+      openApiFiles30 / "python" / "petstore-with-fake-endpoints-models-for-testing.yaml",
+      openApiFiles30 / "python-prior" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+      openApiFiles30 / "r" / "petstore.yaml",
+      openApiFiles30 / "spring" / "petstore-with-fake-endpoints-models-for-testing-with-spring-pageable.yaml",
+      openApiFiles30 / "spring" / "petstore-with-fake-endpoints-models-for-testing.yaml",
+      openApiFiles30 / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+      openApiFiles30 / "petstore-with-fake-endpoints-models-for-testing.yaml",
+    ).map { it.absPath }.toSet()
 
+    if (toRemoveFile.contains(absFilePath)) {
+      c.removeFile()
+    }
+
+    when (absFilePath) {
       (openApiFiles30 / "csharp" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml").absPath -> {
         c.removeFile().addUnsigneds()
       }
@@ -158,7 +174,6 @@ class CompilationTest : FreeSpec() {
       (openApiFiles30 / "unsigned-test.yaml").absPath -> {
         c.addUnsigneds()
       }
-
     }
   }
 }

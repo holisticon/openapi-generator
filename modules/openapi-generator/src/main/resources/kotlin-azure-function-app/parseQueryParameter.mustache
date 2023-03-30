@@ -17,6 +17,9 @@
   {{#isNumeric}}
     {{dataType}}.parse(it)
   {{/isNumeric}}
+  {{#isNumber}}
+    {{dataType}}(it)
+  {{/isNumber}}
   {{#isInteger}}
       it.toInt()
   {{/isInteger}}
