@@ -39,10 +39,13 @@
     {{#debug}}a hidden enum{{/debug}}
     {{>smartDataType}}.valueOf(it){{#debug}}hiddenEnum{{/debug}}
   {{/hiddenEnum}}
-  {{#schema}}{{#isModel}}
+  {{#schema}}{{#isModel}}{{^isArray}}{{^isMap}}
       TODO() /* no object support in query parameters */
-  {{/isModel}}{{/schema}}
+  {{/isMap}}{{/isArray}}{{/isModel}}{{/schema}}
+
   {{#isArray}}TODO()/* array of strings */{{/isArray}}
+  {{#isMap}}TODO()/* map of strings */{{/isMap}}
+
   }
 {{/trim1L}}{{/isString}}{{/isUuid}}
 
