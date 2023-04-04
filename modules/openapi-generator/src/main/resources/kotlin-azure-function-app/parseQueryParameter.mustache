@@ -45,7 +45,9 @@
 
   {{#isArray}}TODO()/* array of strings */{{/isArray}}
   {{#isMap}}TODO()/* map of strings */{{/isMap}}
-
+  {{^isMap}}{{^isArray}}{{^isPrimitiveType}}{{#schema}}{{! CodegenProperty }}{{#isPrimitiveType}}{{#debug}}CodegenProperty - isPrimitiveType{{/debug}}
+    it.to{{#rmKotlin}}{{dataType}}{{/rmKotlin}}()
+  {{/isPrimitiveType}}{{/schema}}{{/isPrimitiveType}}{{/isArray}}{{/isMap}}
   }
 {{/trim1L}}{{/isString}}{{/isUuid}}
 

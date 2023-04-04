@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
     {
         this.propertyAdditionalKeywords.add("request"); // TODO test this
+        typeMapping.put("int", "kotlin.Int");
     }
     private <T> Stream<T> toStream(Optional<T> o) {
         return o.map(Stream::of).orElse(Stream.empty());
@@ -151,6 +152,10 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         };
         final Mustache.Lambda removeApiSuffix =
                 (fragment, writer) -> writer.write(fragment.execute().replaceAll(apiSuffix, ""));
+
+        final Mustache.Lambda rmKotlin =
+                (fragment, writer) -> writer.write(fragment.execute().replace("kotlin.", ""));
+
         final Mustache.Lambda formatPath =
                 (fragment, writer) -> writer.write(fragment.execute().replaceFirst("^/", ""));
         final Mustache.Lambda removeEmptyLines =
@@ -346,6 +351,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         };
 
         additionalProperties.put("removeApiSuffix", removeApiSuffix);
+        additionalProperties.put("rmKotlin", rmKotlin);
         additionalProperties.put("formatPath", formatPath);
         additionalProperties.put("upperFirstLetter", upperFirstLetter);
         additionalProperties.put("removeEmptyLines", removeEmptyLines);
