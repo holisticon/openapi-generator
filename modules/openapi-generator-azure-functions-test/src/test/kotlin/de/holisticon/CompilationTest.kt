@@ -29,7 +29,7 @@ class CompilationTest : FreeSpec() {
 
   init {
     "focus" {
-      val openapiFile = openApiFiles30 / "deepobject.yaml"
+      val openapiFile = openApiFiles30 / "kotlin" / "issue13506-defaultValue-numbers.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",

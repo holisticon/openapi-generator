@@ -5,7 +5,12 @@
 
   {{#isNumeric}}{{#defaultValue}}
     {{#debug}}Numeric with default{{/debug}}
-    {{dataType}}({{defaultValue}})
+    {{^isPrimitiveType}}
+      {{dataType}}({{defaultValue}})
+    {{/isPrimitiveType}}
+    {{#isPrimitiveType}}
+      {{defaultValue}}
+    {{/isPrimitiveType}}
   {{/defaultValue}}{{/isNumeric}}
   {{^isNumeric}}
 
