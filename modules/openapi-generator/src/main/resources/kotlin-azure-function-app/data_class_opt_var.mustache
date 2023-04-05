@@ -1,7 +1,7 @@
 {{#description}}
   /* {{{.}}} */
 {{/description}}
-{{>modelMutable}} {{{name}}}: {{#isEnum}}{{classname}}.{{nameInCamelCase}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}? = {{#trim1L}}
+{{>modelMutable}} {{#orEMPTY}}{{{name}}}{{/orEMPTY}}: {{#isEnum}}{{classname}}.{{nameInCamelCase}}{{/isEnum}}{{^isEnum}}{{{dataType}}}{{/isEnum}}? = {{#trim1L}}
 
   {{#isNumeric}}{{#defaultValue}}
     {{#debug}}Numeric with default{{/debug}}
