@@ -19,9 +19,10 @@
     {{dataType}}.fromString({{defaultValue}})
   {{/defaultValue}}{{/isUuid}}
 
-  {{^isUuid}}
-  {{#debug}}non non uuid numeric{{/debug}}
-    {{{defaultValue}}}
-  {{/isUuid}}{{/isNumeric}}
+  {{#defaultValue}}{{^isUuid}}
+  {{#debug}}non uuid, non numeric{{/debug}}
+    {{{defaultValue}}}{{#isArray}}.toTypedArray(){{/isArray}} {{! AbstractKotlinCodegen.toDefaultValue creates an "arrayList" instead of an array as default --}}
+  {{/isUuid}}{{/defaultValue}}{{/isNumeric}}
+
   {{^defaultValue}}null{{/defaultValue}}
 {{/trim1L}}
