@@ -6,6 +6,13 @@
   }
 {{/isUuid}}
 
+{{#schema}}{{#isUri}}
+  ?.let{
+    {{#debug}}isUri{{/debug}}
+    {{dataType}}.create(it)
+  }
+{{/isUri}}{{/schema}}
+
 {{^isUuid}}{{^isString}}{{#trim1L}}
   ?.let {
   {{#debug}}parse non string query parameter{{/debug}}

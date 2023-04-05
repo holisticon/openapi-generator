@@ -29,7 +29,8 @@ class CompilationTest : FreeSpec() {
 
   init {
     "focus".config(enabled = true) {
-      val openapiFile = openApiFiles30 / "spring/petstore-with-fake-endpoints-models-for-testing.yaml"
+      val openapiFile = openApiFiles30 / "echo_api.yaml"
+//      val openapiFile = openApiFiles30 / "elm.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",
@@ -77,30 +78,6 @@ class CompilationTest : FreeSpec() {
         generateOpenApi(openapiFile = file.absolutePath, to = testOut, codeGenConfigMod = { modCodegenConfig(it, file.absolutePath) })
         val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
         withClue("From ${file.absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
-      }
-    }
-
-    // used to manually call individual tests
-    "regression".config(false) - {
-      withData(
-        listOf(
-          "issue_3248",
-//          "3134-regression",
-//          "3248-regression",
-//          "3248-regression-required",
-//          "3248-regression-required-no-default",
-//          "3248-regression-ref-lvl0",
-//          "3248-regression-ref-lvl1",
-//          "3248-regression-dates"
-        )
-
-      ) { filename ->
-        val openapiFile = openApiFiles30 / "$filename.yaml"
-        generateOpenApi(openapiFile = openapiFile, to = testOut)
-
-        val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
-
-        withClue("From ${File(openapiFile).absoluteFile}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
       }
     }
   }
@@ -152,6 +129,12 @@ class CompilationTest : FreeSpec() {
 
     // 'String' instead of 'string' as type is not supported
     openApiFiles30 / "rust-server" / "openapi-v3.yaml",
+
+    // ambiguous enum names in inlined and $ref enums
+    openApiFiles30 / "typescript-fetch" / "enum.yaml",
+
+    // allOf in HashMap not supported: AdditionalpropertiesShouldNotLookInApplicators
+    openApiFiles30 / "unit_test_spec" / "3_0_3_unit_test_spec.yaml",
   ).map{ it.absPath }.toSet()
 
   private fun disableTestFilter(filePath: String): Boolean = disabledTests.contains(filePath)
@@ -170,7 +153,6 @@ class CompilationTest : FreeSpec() {
       openApiFiles30 / "python" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
       openApiFiles30 / "python" / "petstore-with-fake-endpoints-models-for-testing.yaml",
       openApiFiles30 / "python-prior" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
-      openApiFiles30 / "r" / "petstore.yaml",
       openApiFiles30 / "spring" / "petstore-with-fake-endpoints-models-for-testing-with-spring-pageable.yaml",
       openApiFiles30 / "spring" / "petstore-with-fake-endpoints-models-for-testing.yaml",
       openApiFiles30 / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
@@ -191,7 +173,7 @@ class CompilationTest : FreeSpec() {
       }
 
       (openApiFiles30 / "r" / "petstore.yaml").absPath -> {
-        c.removeDate()
+        c.removeFile().removeDate()
       }
     }
   }

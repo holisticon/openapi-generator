@@ -36,8 +36,9 @@ import org.slf4j.LoggerFactory;
 
 public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
     {
-        this.propertyAdditionalKeywords.add("request"); // TODO test this
+        propertyAdditionalKeywords.add("request"); // TODO test this
         typeMapping.put("int", "kotlin.Int");
+        typeMapping.put("null", "kotlin.Nothing"); // null for nullable seems to be 3.1 (https://stackoverflow.com/questions/48111459/how-to-define-a-property-that-can-be-string-or-null-in-openapi-swagger)
     }
 
     private <T> Stream<T> toStream(Optional<T> o) {

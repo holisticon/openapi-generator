@@ -32,7 +32,7 @@ interface {{classname}}Interface {
     {{/isArray}}
     {{^isArray}}
       {{#isEnum}}{{>enum_nested}}{{/isEnum}}
-    {{^isEnum}}{{#debug}}TODO: filtered non-enum parameter named: {{baseName}} {{/debug}}{{/isEnum}}
+    {{^isEnum}}{{#debug}}filtered non-enum parameter named: {{baseName}} {{/debug}}{{/isEnum}}
     {{/isArray}}
   {{/removeEmptyLines}}{{/allParams}}{{/operation}}
   }
