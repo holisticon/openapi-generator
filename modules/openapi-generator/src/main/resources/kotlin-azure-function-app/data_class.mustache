@@ -46,11 +46,12 @@ data class {{classname}}(
     {{#isMap}}{{#items}}{{dataType}}{{/items}}{{/isMap}}
     {{^isMap}}{{dataType}}{{/isMap}}{{/isArray}}
     {{/trim1L}}){ {{#debug}}data_class enum{{/debug}}
-    {{#allowableValues}}
-    {{#enumVars}}
-      {{#orEMPTY}}{{&name}}{{/orEMPTY}}({{{value}}}){{^-last}},{{/-last}}{{#-last}};{{/-last}}
-    {{/enumVars}}
-    {{/allowableValues}}
+    {{#allowableValues}}{{#enumVars}}
+      {{#orEMPTY}}{{&name}}{{/orEMPTY}}{{#trim1L}}(
+      {{#isString}}{{{value}}}{{/isString}}
+      {{^isString}}{{#rmQuotation}}{{{value}}}{{/rmQuotation}}{{/isString}}
+      ){{^-last}},{{/-last}}{{#-last}};{{/-last}}{{/trim1L}}
+    {{/enumVars}}{{/allowableValues}}
     }
 {{/isEnum}}
 {{/vars}}

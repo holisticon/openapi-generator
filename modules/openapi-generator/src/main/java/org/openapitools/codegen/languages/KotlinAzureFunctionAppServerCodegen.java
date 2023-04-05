@@ -39,6 +39,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         this.propertyAdditionalKeywords.add("request"); // TODO test this
         typeMapping.put("int", "kotlin.Int");
     }
+
     private <T> Stream<T> toStream(Optional<T> o) {
         return o.map(Stream::of).orElse(Stream.empty());
     }
@@ -156,6 +157,15 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         final Mustache.Lambda rmKotlin =
                 (fragment, writer) -> writer.write(fragment.execute().replace("kotlin.", ""));
 
+        final Mustache.Lambda rmQuotation =
+                (fragment, writer) -> {
+                    String res = fragment.execute();
+                    if (res.length() >= 2 && '"' == res.charAt(0) && '"' == res.charAt(res.length() -1 )) {
+                        res = res.substring(1, res.length() - 1);
+                    }
+                    writer.write(res);
+                };
+
         final Mustache.Lambda formatPath =
                 (fragment, writer) -> writer.write(fragment.execute().replaceFirst("^/", ""));
         final Mustache.Lambda removeEmptyLines =
@@ -258,7 +268,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
 
         final Mustache.Lambda orEmpty = (fragment, writer) -> {
             String res = fragment.execute();
-            if(res.isEmpty()) {
+            if (res.isEmpty()) {
                 res = "EMPTY";
             }
             writer.write(res);
@@ -300,14 +310,14 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         final Mustache.InvertibleLambda needsExplicitHttpCode = new Mustache.InvertibleLambda() {
             public void logic(Template.Fragment fragment, Writer writer, boolean match) throws IOException {
                 CodegenResponse codegenResponse = null;
-                for(int i = 0; codegenResponse == null ;i++){
-                    Object ctx =fragment.context(i);
-                    if(ctx instanceof CodegenResponse){
+                for (int i = 0; codegenResponse == null; i++) {
+                    Object ctx = fragment.context(i);
+                    if (ctx instanceof CodegenResponse) {
                         codegenResponse = (CodegenResponse) ctx;
                         break;
                     }
                 }
-                if((codegenResponse.isRange() || codegenResponse.isWildcard() || codegenResponse.isDefault ) == match) {
+                if ((codegenResponse.isRange() || codegenResponse.isWildcard() || codegenResponse.isDefault) == match) {
                     fragment.execute(fragment.context(), writer);
                 }
             }
@@ -352,6 +362,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
 
         additionalProperties.put("removeApiSuffix", removeApiSuffix);
         additionalProperties.put("rmKotlin", rmKotlin);
+        additionalProperties.put("rmQuotation", rmQuotation);
         additionalProperties.put("formatPath", formatPath);
         additionalProperties.put("upperFirstLetter", upperFirstLetter);
         additionalProperties.put("removeEmptyLines", removeEmptyLines);

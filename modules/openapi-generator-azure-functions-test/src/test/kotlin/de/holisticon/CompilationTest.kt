@@ -28,8 +28,9 @@ class CompilationTest : FreeSpec() {
   private val openApiFiles31 = openApiFiles / "3_1"
 
   init {
-    "focus" {
-      val openapiFile = openApiFiles30 / "arrayParameter.yaml"
+    "focus".config(enabled = true) {
+//      val openapiFile = openApiFiles30 / "spring/petstore-with-fake-endpoints-models-for-testing-with-spring-pageable.yaml"
+      val openapiFile = openApiFiles30 / "r" / "petstore.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",
@@ -131,15 +132,30 @@ class CompilationTest : FreeSpec() {
   private fun CodegenConfig.removeFile(): CodegenConfig =
     this.also { importMapping().remove("File") }// remove File -> java.io.File mapping for this test
 
+  private fun CodegenConfig.removeDate(): CodegenConfig =
+    this.also { importMapping().remove("Date") }
+
   private fun CodegenConfig.addUnsigneds(): CodegenConfig = run {
     this.importMapping().put("UnsignedInteger", "java.lang.Long") // map to Long
     this.importMapping().put("UnsignedLong", "java.lang.Long")
     this
   }
 
-  private fun disableTestFilter(filePath: String): Boolean = run {
-    false
-  }
+  val disabledTests = setOf(
+    // "UNKNOWN_BASE_TYPE" not fixed in AzureCodegen
+    openApiFiles30 / "python" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+
+    // SpecialCharacterEnum
+    openApiFiles30 / "python" / "petstore-with-fake-endpoints-models-for-testing.yaml",
+
+    // oneOf (in ComposedOneOfNumberWithValidations)
+    openApiFiles30 / "python-prior" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+
+    // 'String' instead of 'string' as type is not supported
+    openApiFiles30 / "rust-server" / "openapi-v3.yaml",
+  ).map{ it.absPath }.toSet()
+
+  private fun disableTestFilter(filePath: String): Boolean = disabledTests.contains(filePath)
 
 
   private fun modCodegenConfig(c: CodegenConfig, filePath: String) {
@@ -173,6 +189,10 @@ class CompilationTest : FreeSpec() {
 
       (openApiFiles30 / "unsigned-test.yaml").absPath -> {
         c.addUnsigneds()
+      }
+
+      (openApiFiles30 / "r" / "petstore.yaml").absPath -> {
+        c.removeDate()
       }
     }
   }

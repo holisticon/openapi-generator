@@ -1,5 +1,5 @@
 {{#debug}}interfaceMethodParams.mustache{{/debug}}
-request: HttpRequestMessage<{{#bodyParam}}{{dataType}}{{/bodyParam}}{{^bodyParam}}{{^formParams.isEmpty}}String{{/formParams.isEmpty}}{{^ formParams }}Void{{/ formParams }}{{/bodyParam}}>,
+request: HttpRequestMessage<{{#bodyParam}}{{#debug}}bodyParam{{/debug}}{{dataType}}{{/bodyParam}}{{^bodyParam}}{{^formParams.isEmpty}}String{{/formParams.isEmpty}}{{^formParams}}Void{{/formParams}}{{/bodyParam}}>,
 {{#vendorExtensions.x-azure-additional-properties}}
 {{parameterName}}: {{{parameterType}}},
 {{/vendorExtensions.x-azure-additional-properties}}
