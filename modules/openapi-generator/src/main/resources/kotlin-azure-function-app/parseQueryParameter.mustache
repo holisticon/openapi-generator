@@ -1,6 +1,7 @@
 {{! in CodegenParameter }}
 {{#isUuid}}
   ?.let{
+    {{#debug}}isUuid{{/debug}}
     {{dataType}}.fromString(it)
   }
 {{/isUuid}}
@@ -62,6 +63,7 @@
 {{#defaultValue}}
     {{#trim1L}}
     ?:
+    {{#debug}}defaultValue{{/debug}}
     {{#isEnum}}
       {{#getSchema}}{{defaultValue}}{{/getSchema}}{{#debug}}defaultValue.isEnum{{/debug}}
     {{/isEnum}}

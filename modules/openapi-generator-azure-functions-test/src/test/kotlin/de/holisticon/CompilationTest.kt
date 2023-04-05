@@ -29,8 +29,7 @@ class CompilationTest : FreeSpec() {
 
   init {
     "focus".config(enabled = true) {
-//      val openapiFile = openApiFiles30 / "spring/petstore-with-fake-endpoints-models-for-testing-with-spring-pageable.yaml"
-      val openapiFile = openApiFiles30 / "r" / "petstore.yaml"
+      val openapiFile = openApiFiles30 / "spring/petstore-with-fake-endpoints-models-for-testing-with-spring-pageable.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",
