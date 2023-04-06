@@ -15,7 +15,7 @@
 
 {{^isUuid}}{{^isString}}{{#trim1L}}
   ?.let {
-  {{#debug}}parse non string query parameter{{/debug}}
+  {{#debug}}parse non string query parameter{{/debug}}{{#dump}}{{/dump}}
   {{#isDate}}
     {{dataType}}.parse(it)
   {{/isDate}}
@@ -43,6 +43,12 @@
   {{#isFloat}}
       it.toFloat()
   {{/isFloat}}
+  {{#isByteArray}}
+    it.encodeToByteArray()
+  {{/isByteArray}}
+  {{#isBinary}}
+    TODO() /* figure out how to handle files in query parameters */
+  {{/isBinary}}
   {{#hiddenEnum}}
     {{#debug}}a hidden enum{{/debug}}
     {{>smartDataType}}.valueOf(it){{#debug}}hiddenEnum{{/debug}}

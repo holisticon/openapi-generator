@@ -3,4 +3,4 @@ request: HttpRequestMessage<{{#bodyParam}}{{#debug}}bodyParam{{/debug}}{{dataTyp
 {{#vendorExtensions.x-azure-additional-properties}}
 {{parameterName}}: {{{parameterType}}},
 {{/vendorExtensions.x-azure-additional-properties}}
-{{#allParams}}{{^isFormParam}}{{paramName}}: {{>optionalDataType}},{{/isFormParam}}{{/allParams}}
+{{#allParams}}{{^isFormParam}}  {{#trim1L}}{{paramName}}: {{>optionalDataType}},{{/trim1L}}{{/isFormParam}}{{/allParams}}

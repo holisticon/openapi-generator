@@ -31,9 +31,7 @@ class CompilationTest : FreeSpec() {
 
   init {
     "focus".config(enabled = true) {
-      // issue_7651.yaml
-      // issue_8535.yaml
-      val openapiFile = openApiFiles30 / "issue_6762.yaml"
+      val openapiFile = openApiFiles30 / "issue_8535.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",
@@ -137,6 +135,10 @@ class CompilationTest : FreeSpec() {
     // somewhere in updateCodegenPropertyEnum / updateDataTypeWithEnumForArray / toDefaultValue
     // the enum literals should be prefixed with enum type.
     openApiFiles30 / "echo_api.yaml",
+
+    // kotlin correctly doesn't handle  listOfNulls: kotlin.Array<kotlin.Nothing>?
+    openApiFiles30 / "issue_7651.yaml",
+
   ).map { it.absPath }.toSet()
 
   private fun disableTestFilter(filePath: String): Boolean = disabledTests.contains(filePath)
