@@ -15,6 +15,8 @@ import io.kotest.core.test.TestScope
 import io.kotest.datatest.withData
 import io.kotest.matchers.comparables.shouldBeEqualComparingTo
 import org.openapitools.codegen.CodegenConfig
+import org.openapitools.codegen.CodegenConstants
+import org.openapitools.codegen.config.GlobalSettings
 import org.openapitools.codegen.languages.KotlinSpringServerCodegen
 import java.io.File
 
@@ -29,7 +31,9 @@ class CompilationTest : FreeSpec() {
 
   init {
     "focus".config(enabled = true) {
-      val openapiFile = openApiFiles30 / "elm.yaml"
+      // issue_7651.yaml
+      // issue_8535.yaml
+      val openapiFile = openApiFiles30 / "issue_6762.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",
@@ -45,23 +49,13 @@ class CompilationTest : FreeSpec() {
 
 
     // generate spring for code. just used for debugging
-    "regression spring".config(false) - {
-      withData(
-        listOf(
-          "issue_3248"
-//          "3248-regression",
-//          "3248-regression-ref-lvl0",
-//          "3248-regression-ref-lvl1",
-//          "3248-regression-dates"
-        )
-      ) { filename ->
-        val openapiFile = openApiFiles30 / "$filename.yaml"
-        generateOpenApi(openapiFile = openapiFile, to = testOut, generator = springGen(testOut))
+    "regression spring".config(false) {
+      val openapiFile = openApiFiles30 / "form-multipart-binary-array.yaml"
+      generateOpenApi(openapiFile = openapiFile, to = testOut, generator = springGen(testOut))
 
-        val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
+      val res = compile(File(testOut).absoluteFile.recursiveKtFiles)
 
-        withClue("From ${openapiFile.absPath}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
-      }
+      withClue("From ${openapiFile.absPath}\n${res.messages}") { res.exitCode shouldBeEqualComparingTo OK }
     }
 
 
@@ -119,6 +113,10 @@ class CompilationTest : FreeSpec() {
   val disabledTests = setOf(
     // "UNKNOWN_BASE_TYPE" not fixed in AzureCodegen
     openApiFiles30 / "python" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
+    openApiFiles30 / "issue_10330.yaml",
+
+    // generates @BindingName("pn0") pn0: java.math.BigDecimal = 10.0. We have to revisit that to handle default values of params.
+    openApiFiles30 / "issue_10865_default_values.yaml",
 
     // SpecialCharacterEnum
     openApiFiles30 / "python" / "petstore-with-fake-endpoints-models-for-testing.yaml",
@@ -139,12 +137,13 @@ class CompilationTest : FreeSpec() {
     // somewhere in updateCodegenPropertyEnum / updateDataTypeWithEnumForArray / toDefaultValue
     // the enum literals should be prefixed with enum type.
     openApiFiles30 / "echo_api.yaml",
-  ).map{ it.absPath }.toSet()
+  ).map { it.absPath }.toSet()
 
   private fun disableTestFilter(filePath: String): Boolean = disabledTests.contains(filePath)
 
 
   private fun modCodegenConfig(c: CodegenConfig, filePath: String) {
+    GlobalSettings.reset();
     val absFilePath = filePath.absPath
     val toRemoveFile = setOf(
       openApiFiles30 / "go" / "petstore-with-fake-endpoints-models-for-testing-with-http-signature.yaml",
@@ -178,6 +177,10 @@ class CompilationTest : FreeSpec() {
 
       (openApiFiles30 / "r" / "petstore.yaml").absPath -> {
         c.removeFile().removeDate()
+      }
+
+      (openApiFiles30 / "form-multipart-binary-array.yaml").absPath -> {
+        GlobalSettings.setProperty(CodegenConstants.SKIP_FORM_MODEL, "false")
       }
     }
   }

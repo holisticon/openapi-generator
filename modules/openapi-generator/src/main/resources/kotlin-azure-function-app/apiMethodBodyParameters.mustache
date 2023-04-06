@@ -10,7 +10,18 @@ val {{paramName}}: {{datatypeWithEnum}}{{^datatypeWithEnum}}{{dataType}}{{/datat
 
 // path parameter {{! ----------------------  pathParams ---------------------- for non basic type handling }}
 {{#pathParams}}{{#isEnum}}
-  val {{#addEnumSuffix}}{{paramName}}{{/addEnumSuffix}} = {{paramName}}?.let { {{datatypeWithEnum}}.valueOf(it) }
+  val {{#addEnumSuffix}}{{paramName}}{{/addEnumSuffix}} = {{paramName}}{{#break}}{{/break}}?.let { {{#trim1L}}
+    {{#isString}}
+      {{datatypeWithEnum}}.valueOf(it)
+    {{/isString}}
+    {{^isString}}
+      p -> {{datatypeWithEnum}}.values().find { it.value == p }
+    {{/isString}}
+    } {{/trim1L}}
+  {{#defaultValue}}
+  ?: {{#trim1L}}
+   {{enumName}}.{{enumDefaultValue}}
+  {{/trim1L}}{{/defaultValue}}
 {{/isEnum}}{{/pathParams}}
 
 // header parameter{{! ----------------------  headerParams ----------------------}}
