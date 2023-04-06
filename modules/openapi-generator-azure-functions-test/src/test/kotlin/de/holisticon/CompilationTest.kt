@@ -29,8 +29,7 @@ class CompilationTest : FreeSpec() {
 
   init {
     "focus".config(enabled = true) {
-      val openapiFile = openApiFiles30 / "echo_api.yaml"
-//      val openapiFile = openApiFiles30 / "elm.yaml"
+      val openapiFile = openApiFiles30 / "elm.yaml"
       println("From: ${openapiFile.absPath}")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",
@@ -135,6 +134,11 @@ class CompilationTest : FreeSpec() {
 
     // allOf in HashMap not supported: AdditionalpropertiesShouldNotLookInApplicators
     openApiFiles30 / "unit_test_spec" / "3_0_3_unit_test_spec.yaml",
+
+    // default values for enum arrays should be handled by another Default/Abstract*Codegen.
+    // somewhere in updateCodegenPropertyEnum / updateDataTypeWithEnumForArray / toDefaultValue
+    // the enum literals should be prefixed with enum type.
+    openApiFiles30 / "echo_api.yaml",
   ).map{ it.absPath }.toSet()
 
   private fun disableTestFilter(filePath: String): Boolean = disabledTests.contains(filePath)

@@ -5,9 +5,13 @@
 
 // query parameter {{! ----------------------  queryParams ---------------------- for keywords: baseName='data', paramName='`data`' }}
 {{#queryParams}}
-
 val {{paramName}}: {{datatypeWithEnum}}{{^datatypeWithEnum}}{{dataType}}{{/datatypeWithEnum}}{{^defaultValue}}?{{/defaultValue}} = request.queryParameters["{{baseName}}"]{{>parseQueryParameter}}
 {{/queryParams}}
+
+// path parameter {{! ----------------------  pathParams ---------------------- for non basic type handling }}
+{{#pathParams}}{{#isEnum}}
+  val {{#addEnumSuffix}}{{paramName}}{{/addEnumSuffix}} = {{paramName}}?.let { {{datatypeWithEnum}}.valueOf(it) }
+{{/isEnum}}{{/pathParams}}
 
 // header parameter{{! ----------------------  headerParams ----------------------}}
 {{#headerParams}}
@@ -20,7 +24,7 @@ val {{paramName}} = request.headers["{{baseName}}"]{{>parseQueryParameter}}
 {{/cookieParams}}
 
 
-// required parameter validation
+// required parameter validation {{! ----------------------  parameter validation ----------------------}}
 val notSetRequiredParams = mutableSetOf<String>()
 {{#allParams}}{{^defaultValue}}{{#required}}
 {{#bodyFormParam}}// TODO: bodyFormParam [{{paramName}}/{{baseName}}] must be parsed from the body{{#debug}}filtered {{paramName}}/{{baseName}} because it's a form body parameter{{/debug}}{{/bodyFormParam}}

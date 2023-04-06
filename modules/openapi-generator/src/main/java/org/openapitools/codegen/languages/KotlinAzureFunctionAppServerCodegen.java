@@ -258,6 +258,17 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         }
     };
 
+    final Mustache.Lambda addEnumSuffix = (fragment, writer) -> {
+        String suffix = "Enum";
+        String normal = fragment.execute();
+        String result;
+        if(normal.endsWith("`")){
+            result = normal.substring(0, normal.length()-1) + suffix + "`";
+        } else {
+            result = normal + suffix;
+        }
+        writer.write(result);
+    };
 
     final Mustache.Lambda debugLambda = (fragment, writer) -> {
         if (mustacheDebug) writer.write("/*" + fragment.execute().trim() + "*/");
@@ -395,6 +406,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         additionalProperties.put("bodyFormParam",bodyFormParam);
         additionalProperties.put("orEMPTY",orEmpty);
         additionalProperties.put("needsExplicitHttpCode",needsExplicitHttpCode);
+        additionalProperties.put("addEnumSuffix",addEnumSuffix);
 //        additionalProperties.put("enumDefaultValue", enumDefaultValue);
 }
 

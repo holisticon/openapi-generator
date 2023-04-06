@@ -42,7 +42,18 @@ class {{classname}} {
     {{#removeEmptyLines}}{{#lambda.indented}}{{>methodParams}}{{/lambda.indented}}{{/removeEmptyLines}}
   ): HttpResponseMessage {
     {{#lambda.indented}}{{#removeEmptyLines}}{{>apiMethodBodyParameters}}{{/removeEmptyLines}}{{/lambda.indented}}
-    val response = api.{{operationId}}(request = request {{#vendorExtensions.x-azure-additional-properties}}, {{parameterName}} = {{parameterName}}{{/vendorExtensions.x-azure-additional-properties}}{{#allParams}}{{^isFormParam}}, {{paramName}} = {{paramName}}{{^defaultValue}}{{#required}}!!{{/required}}{{/defaultValue}}{{/isFormParam}}{{/allParams}})
+    val response = api.{{operationId}}(
+      request = request
+      {{#vendorExtensions.x-azure-additional-properties}},{{parameterName}} = {{parameterName}}{{/vendorExtensions.x-azure-additional-properties}}
+      {{#allParams}}{{#trim1L}}{{^isFormParam}},
+        {{paramName}} =
+          {{^isPathParam}}{{paramName}}{{/isPathParam}}
+          {{#isPathParam}}
+            {{#isEnum}}{{#addEnumSuffix}}{{paramName}}{{/addEnumSuffix}}{{/isEnum}}
+            {{^isEnum}}{{paramName}}{{/isEnum}}
+          {{/isPathParam}}
+        {{^defaultValue}}{{#required}}!!{{/required}}{{/defaultValue}}
+      {{/isFormParam}}{{/trim1L}}{{/allParams}})
 
     val builder = request.createResponseBuilder(response.status).body(response.body)
     if(response.contentType != null){
