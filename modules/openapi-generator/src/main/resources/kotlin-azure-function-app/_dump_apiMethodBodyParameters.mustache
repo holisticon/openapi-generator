@@ -1,6 +1,0 @@
-{{!
-}}{{^isArray}}{{#isEnum}}{{#debug}} <<< no array and enum >>>
-{{/debug}}?.let{ {{enumName}}.valueOf(it) }{{#defaultValue}} ?: {{enumName}}.valueOf("{{defaultValue}}"){{/defaultValue}}  {{/isEnum}}{{/isArray}}{{!
-}}{{#isArray}}{{#debug}} <<< array >>>{{/debug}}{{!
-}}?.split(",")?.toTypedArray() ?: emptyArray(){{/isArray}}{{!
-}}{{^isArray}}{{^isEnum}}{{^isEnum}}{{#debug}} <<< no array no enum >>> {{/debug}}{{#dump}}{{/dump}}{{#defaultValue}} ?: {{{dataType}}}.{{defaultValue}}{{/defaultValue}}{{^defaultValue}}{{/defaultValue}}{{/isEnum}}{{/isEnum}}{{/isArray}}{{!

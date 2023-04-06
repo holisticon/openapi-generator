@@ -5,7 +5,7 @@
 
 // query parameter {{! ----------------------  queryParams ---------------------- for keywords: baseName='data', paramName='`data`' }}
 {{#queryParams}}
-val {{paramName}}: {{datatypeWithEnum}}{{^datatypeWithEnum}}{{dataType}}{{/datatypeWithEnum}}{{^defaultValue}}?{{/defaultValue}} = request.queryParameters["{{baseName}}"]{{>parseQueryParameter}}
+val {{paramName}}: {{datatypeWithEnum}}{{^datatypeWithEnum}}{{dataType}}{{/datatypeWithEnum}}{{^defaultValue}}?{{/defaultValue}} = request.queryParameters["{{baseName}}"]{{#rmNl}}{{>parseQueryParameter}}{{/rmNl}}
 {{/queryParams}}
 
 // path parameter {{! ----------------------  pathParams ---------------------- for non basic type handling }}
@@ -26,7 +26,7 @@ val {{paramName}}: {{datatypeWithEnum}}{{^datatypeWithEnum}}{{dataType}}{{/datat
 
 // header parameter{{! ----------------------  headerParams ----------------------}}
 {{#headerParams}}
-val {{paramName}} = request.headers["{{baseName}}"]{{>parseQueryParameter}}
+val {{paramName}} = request.headers["{{baseName}}"]{{#rmNl}}{{>parseQueryParameter}}{{/rmNl}}
 {{/headerParams}}
 
 // cookie parameter{{! ----------------------  cookieParams ----------------------}}

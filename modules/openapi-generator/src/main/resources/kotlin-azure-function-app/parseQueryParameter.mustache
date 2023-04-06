@@ -13,9 +13,8 @@
   }
 {{/isUri}}{{/schema}}
 
-{{^isUuid}}{{^isString}}{{#trim1L}}
-  ?.let {
-  {{#debug}}parse non string query parameter{{/debug}}{{#dump}}{{/dump}}
+{{^isUuid}}{{^isString}}?.let {
+  {{#trim1L}}{{#debug}}parse non string query parameter{{/debug}}
   {{#isDate}}
     {{dataType}}.parse(it)
   {{/isDate}}
@@ -61,9 +60,9 @@
   {{#isMap}}TODO()/* map of strings */{{/isMap}}
   {{^isMap}}{{^isArray}}{{^isPrimitiveType}}{{#schema}}{{! CodegenProperty }}{{#isPrimitiveType}}{{#debug}}CodegenProperty - isPrimitiveType{{/debug}}
     it.to{{#rmKotlin}}{{dataType}}{{/rmKotlin}}()
-  {{/isPrimitiveType}}{{/schema}}{{/isPrimitiveType}}{{/isArray}}{{/isMap}}
+  {{/isPrimitiveType}}{{/schema}}{{/isPrimitiveType}}{{/isArray}}{{/isMap}}{{/trim1L}}
   }
-{{/trim1L}}{{/isString}}{{/isUuid}}
+{{/isString}}{{/isUuid}}
 
 {{#isEnum}}{{! nested enums are strings as base type }}
     {{#debug}}non string enum{{/debug}}
@@ -73,8 +72,7 @@
     {{/trim1L}} }
 {{/isEnum}}
 
-{{#defaultValue}}
-    {{#trim1L}}
+{{#defaultValue}} {{#trim1L}}
     ?:
     {{#debug}}defaultValue{{/debug}}
     {{#isEnum}}
@@ -86,8 +84,12 @@
     {{#enum}}
       {{#getSchema}}{{defaultValue}}{{/getSchema}}{{#debug}}enum{{/debug}}
     {{/enum}}
-      {{^enum}}{{^isEnum}}{{^hiddenEnum}}
-        {{defaultValue}}{{#debug}}set default value{{/debug}}
+      {{^enum}}{{^isEnum}}{{^hiddenEnum}}{{#debug}}set default value{{/debug}}
+        {{#isNumber}}
+          {{dataType}}({{defaultValue}})
+        {{/isNumber}}
+        {{^isNumber}}
+          {{defaultValue}}
+        {{/isNumber}}
       {{/hiddenEnum}}{{/isEnum}}{{/enum}}
-    {{/trim1L}}
-{{/defaultValue}}
+{{/trim1L}}{{/defaultValue}}

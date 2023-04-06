@@ -175,6 +175,10 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
                 (fragment, writer) -> writer.write(fragment.execute().trim());
         final Mustache.Lambda noNewlines =
                 (fragment, writer) -> writer.write(fragment.execute().replaceAll("\\n", ""));
+        final Mustache.Lambda rmNl =
+                (fragment, writer) -> writer.write(
+                        fragment.execute().replaceAll("\\n[\\p{C}\\s]*\\n", ""));
+
 
         class ContentTypeMapContext {
             public final String key;
@@ -224,7 +228,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
                 };
 
         final Mustache.Lambda hiddenEnum = new Mustache.InvertibleLambda() {
-            private boolean isHiddenEnum(Template.Fragment fragment)  {
+            private boolean isHiddenEnum(Template.Fragment fragment) {
                 Object ctx = fragment.context();
                 for (int i = 1; ctx != null && !(ctx instanceof CodegenParameter); i++) {
                     try {
@@ -246,169 +250,171 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
                 }
             }
 
-        @Override
-        public void execute (Template.Fragment frag, Writer out) throws IOException {
-            if(isHiddenEnum(frag))
-                frag.execute(frag.context(), out);
-        }
-        @Override
-        public void executeInverse (Template.Fragment frag, Writer out) throws IOException {
-            if(!isHiddenEnum(frag))
-                frag.execute(frag.context(), out);
-        }
-    };
+            @Override
+            public void execute(Template.Fragment frag, Writer out) throws IOException {
+                if (isHiddenEnum(frag))
+                    frag.execute(frag.context(), out);
+            }
 
-    final Mustache.Lambda addEnumSuffix = (fragment, writer) -> {
-        String suffix = "Enum";
-        String normal = fragment.execute();
-        String result;
-        if(normal.endsWith("`")){
-            result = normal.substring(0, normal.length()-1) + suffix + "`";
-        } else {
-            result = normal + suffix;
-        }
-        writer.write(result);
-    };
+            @Override
+            public void executeInverse(Template.Fragment frag, Writer out) throws IOException {
+                if (!isHiddenEnum(frag))
+                    frag.execute(frag.context(), out);
+            }
+        };
 
-    final Mustache.Lambda debugLambda = (fragment, writer) -> {
-        if (mustacheDebug) writer.write("/*" + fragment.execute().trim() + "*/");
-    };
+        final Mustache.Lambda addEnumSuffix = (fragment, writer) -> {
+            String suffix = "Enum";
+            String normal = fragment.execute();
+            String result;
+            if (normal.endsWith("`")) {
+                result = normal.substring(0, normal.length() - 1) + suffix + "`";
+            } else {
+                result = normal + suffix;
+            }
+            writer.write(result);
+        };
 
-    final Mustache.Lambda genInterfaceImplLambda = (fragment, writer) -> {
-        if (genInterfaceImpl) writer.write(fragment.execute());
-    };
+        final Mustache.Lambda debugLambda = (fragment, writer) -> {
+            if (mustacheDebug) writer.write("/*" + fragment.execute().trim() + "*/");
+        };
 
-    final Function<Integer, Mustache.Lambda> dumpCtxLambda = (i) -> (fragment, writer) -> {
-        if (mustacheDebug)
-            writer.write("/*\n CTX [" + fragment.context(i).getClass() + "]: \n" + fragment.context(i).toString() + "\n*/");
-    };
-    final Mustache.Lambda breakLambda = (fragment, writer) -> {
-        Object context = fragment.context();
-        logger.trace(context.toString());//put breakpoint here to stop
-    };
+        final Mustache.Lambda genInterfaceImplLambda = (fragment, writer) -> {
+            if (genInterfaceImpl) writer.write(fragment.execute());
+        };
 
-    final Mustache.Lambda trimToOneLine = (fragment, writer) -> {
-        if (genInterfaceImpl) writer.write(
-                Arrays.stream(fragment.execute().split("\\n")).map(String::trim).collect(Collectors.joining())
-        );
-    };
+        final Function<Integer, Mustache.Lambda> dumpCtxLambda = (i) -> (fragment, writer) -> {
+            if (mustacheDebug)
+                writer.write("/*\n CTX [" + fragment.context(i).getClass() + "]: \n" + fragment.context(i).toString() + "\n*/");
+        };
+        final Mustache.Lambda breakLambda = (fragment, writer) -> {
+            Object context = fragment.context();
+            logger.trace(context.toString());//put breakpoint here to stop
+        };
 
-    final Mustache.Lambda orEmpty = (fragment, writer) -> {
-        String res = fragment.execute();
-        if (res.isEmpty()) {
-            res = "EMPTY";
-        }
-        writer.write(res);
-    };
+        final Mustache.Lambda trimToOneLine = (fragment, writer) -> {
+            if (genInterfaceImpl) writer.write(
+                    Arrays.stream(fragment.execute().split("\\n")).map(String::trim).collect(Collectors.joining())
+            );
+        };
 
-    final Mustache.InvertibleLambda bodyFormParam = new Mustache.InvertibleLambda() {
-        public void logic(Template.Fragment fragment, Writer writer, boolean match) throws IOException {
-            Object ctx;
-            CodegenParameter codegenParameter = null;
-            for (int i = 0; codegenParameter == null; i++) {
-                try {
-                    ctx = fragment.context(i);
-                    if (ctx instanceof CodegenParameter)
-                        codegenParameter = ((CodegenParameter) ctx);
-                } catch (NullPointerException e) {
-                    break;
+        final Mustache.Lambda orEmpty = (fragment, writer) -> {
+            String res = fragment.execute();
+            if (res.isEmpty()) {
+                res = "EMPTY";
+            }
+            writer.write(res);
+        };
+
+        final Mustache.InvertibleLambda bodyFormParam = new Mustache.InvertibleLambda() {
+            public void logic(Template.Fragment fragment, Writer writer, boolean match) throws IOException {
+                Object ctx;
+                CodegenParameter codegenParameter = null;
+                for (int i = 0; codegenParameter == null; i++) {
+                    try {
+                        ctx = fragment.context(i);
+                        if (ctx instanceof CodegenParameter)
+                            codegenParameter = ((CodegenParameter) ctx);
+                    } catch (NullPointerException e) {
+                        break;
+                    }
+                }
+                if (codegenParameter == null) {
+                    throw new IllegalStateException("could not determine CodegenProperty for noBodyFormParam");
+                } else {
+                    if ((codegenParameter.isFormParam && !codegenParameter.isQueryParam && !codegenParameter.isPathParam) == match) {
+                        fragment.execute(fragment.context(), writer);
+                    }
                 }
             }
-            if (codegenParameter == null) {
-                throw new IllegalStateException("could not determine CodegenProperty for noBodyFormParam");
-            } else {
-                if ((codegenParameter.isFormParam && !codegenParameter.isQueryParam && !codegenParameter.isPathParam) == match) {
+
+            @Override
+            public void execute(Template.Fragment frag, Writer out) throws IOException {
+                logic(frag, out, true);
+            }
+
+            @Override
+            public void executeInverse(Template.Fragment frag, Writer out) throws IOException {
+                logic(frag, out, false);
+            }
+        };
+
+        final Mustache.InvertibleLambda needsExplicitHttpCode = new Mustache.InvertibleLambda() {
+            public void logic(Template.Fragment fragment, Writer writer, boolean match) throws IOException {
+                CodegenResponse codegenResponse = null;
+                for (int i = 0; codegenResponse == null; i++) {
+                    Object ctx = fragment.context(i);
+                    if (ctx instanceof CodegenResponse) {
+                        codegenResponse = (CodegenResponse) ctx;
+                        break;
+                    }
+                }
+                if ((codegenResponse.isRange() || codegenResponse.isWildcard() || codegenResponse.isDefault) == match) {
                     fragment.execute(fragment.context(), writer);
                 }
             }
-        }
 
-        @Override
-        public void execute(Template.Fragment frag, Writer out) throws IOException {
-            logic(frag, out, true);
-        }
+            @Override
+            public void execute(Template.Fragment frag, Writer out) throws IOException {
+                logic(frag, out, true);
+            }
 
-        @Override
-        public void executeInverse(Template.Fragment frag, Writer out) throws IOException {
-            logic(frag, out, false);
-        }
-    };
+            @Override
+            public void executeInverse(Template.Fragment frag, Writer out) throws IOException {
+                logic(frag, out, false);
+            }
+        };
 
-    final Mustache.InvertibleLambda needsExplicitHttpCode = new Mustache.InvertibleLambda() {
-        public void logic(Template.Fragment fragment, Writer writer, boolean match) throws IOException {
-            CodegenResponse codegenResponse = null;
-            for (int i = 0; codegenResponse == null; i++) {
-                Object ctx = fragment.context(i);
-                if (ctx instanceof CodegenResponse) {
-                    codegenResponse = (CodegenResponse) ctx;
-                    break;
+        final Mustache.Lambda enumDefaultValue = (fragment, writer) -> {
+            Object ctx = fragment.context();
+            CodegenProperty codegenParameter = null;
+            for (int i = 1; ctx != null && codegenParameter == null; i++) {
+                try {
+                    ctx = fragment.context(i);
+                    if (ctx instanceof CodegenParameter)
+                        codegenParameter = ((CodegenParameter) ctx).getSchema();
+                } catch (NullPointerException e) {
+                    ctx = null;
                 }
             }
-            if ((codegenResponse.isRange() || codegenResponse.isWildcard() || codegenResponse.isDefault) == match) {
-                fragment.execute(fragment.context(), writer);
+            if (codegenParameter == null) {
+                throw new IllegalStateException("could not determine CodegenProperty for enum");
+            } else {
+                String defV = codegenParameter.defaultValue;
+                if (defV != null) {
+                    Object properDefaultValue = codegenParameter.allowableValues.get(defV);
+                    if (properDefaultValue != null)
+                        fragment.execute(properDefaultValue, writer);
+                    else
+                        throw new IllegalStateException("Could not determine proper enum default value" + StringUtils.join(codegenParameter.allowableValues));
+                } else
+                    throw new IllegalStateException("No default present for" + codegenParameter.name);
             }
-        }
+        };
 
-        @Override
-        public void execute(Template.Fragment frag, Writer out) throws IOException {
-            logic(frag, out, true);
-        }
-
-        @Override
-        public void executeInverse(Template.Fragment frag, Writer out) throws IOException {
-            logic(frag, out, false);
-        }
-    };
-
-    final Mustache.Lambda enumDefaultValue = (fragment, writer) -> {
-        Object ctx = fragment.context();
-        CodegenProperty codegenParameter = null;
-        for (int i = 1; ctx != null && codegenParameter == null; i++) {
-            try {
-                ctx = fragment.context(i);
-                if (ctx instanceof CodegenParameter)
-                    codegenParameter = ((CodegenParameter) ctx).getSchema();
-            } catch (NullPointerException e) {
-                ctx = null;
-            }
-        }
-        if (codegenParameter == null) {
-            throw new IllegalStateException("could not determine CodegenProperty for enum");
-        } else {
-            String defV = codegenParameter.defaultValue;
-            if (defV != null) {
-                Object properDefaultValue = codegenParameter.allowableValues.get(defV);
-                if (properDefaultValue != null)
-                    fragment.execute(properDefaultValue, writer);
-                else
-                    throw new IllegalStateException("Could not determine proper enum default value" + StringUtils.join(codegenParameter.allowableValues));
-            } else
-                throw new IllegalStateException("No default present for" + codegenParameter.name);
-        }
-    };
-
-        additionalProperties.put("removeApiSuffix",removeApiSuffix);
-        additionalProperties.put("rmKotlin",rmKotlin);
-        additionalProperties.put("rmQuotation",rmQuotation);
-        additionalProperties.put("formatPath",formatPath);
-        additionalProperties.put("upperFirstLetter",upperFirstLetter);
-        additionalProperties.put("removeEmptyLines",removeEmptyLines);
-        additionalProperties.put("noNewlines",noNewlines);
-        additionalProperties.put("ContentTypeMap",contentTypeMap);
-        additionalProperties.put("hiddenEnum",hiddenEnum);
-        additionalProperties.put("trim",trimLambda);
-        additionalProperties.put("debug",debugLambda);
-        additionalProperties.put("dump",dumpCtxLambda.apply(0));
-        additionalProperties.put("dump1",dumpCtxLambda.apply(1));
-        additionalProperties.put("break",breakLambda);
-        additionalProperties.put("genInterfaceImpl",genInterfaceImplLambda);
-        additionalProperties.put("trim1L",trimToOneLine);
-        additionalProperties.put("bodyFormParam",bodyFormParam);
-        additionalProperties.put("orEMPTY",orEmpty);
-        additionalProperties.put("needsExplicitHttpCode",needsExplicitHttpCode);
-        additionalProperties.put("addEnumSuffix",addEnumSuffix);
+        additionalProperties.put("removeApiSuffix", removeApiSuffix);
+        additionalProperties.put("rmKotlin", rmKotlin);
+        additionalProperties.put("rmQuotation", rmQuotation);
+        additionalProperties.put("formatPath", formatPath);
+        additionalProperties.put("upperFirstLetter", upperFirstLetter);
+        additionalProperties.put("removeEmptyLines", removeEmptyLines);
+        additionalProperties.put("noNewlines", noNewlines);
+        additionalProperties.put("rmNl", rmNl);
+        additionalProperties.put("ContentTypeMap", contentTypeMap);
+        additionalProperties.put("hiddenEnum", hiddenEnum);
+        additionalProperties.put("trim", trimLambda);
+        additionalProperties.put("debug", debugLambda);
+        additionalProperties.put("dump", dumpCtxLambda.apply(0));
+        additionalProperties.put("dump1", dumpCtxLambda.apply(1));
+        additionalProperties.put("break", breakLambda);
+        additionalProperties.put("genInterfaceImpl", genInterfaceImplLambda);
+        additionalProperties.put("trim1L", trimToOneLine);
+        additionalProperties.put("bodyFormParam", bodyFormParam);
+        additionalProperties.put("orEMPTY", orEmpty);
+        additionalProperties.put("needsExplicitHttpCode", needsExplicitHttpCode);
+        additionalProperties.put("addEnumSuffix", addEnumSuffix);
 //        additionalProperties.put("enumDefaultValue", enumDefaultValue);
-}
+    }
 
     boolean mustacheDebug = false;
     boolean genInterfaceImpl = false;
