@@ -12,7 +12,7 @@ import io.kotest.core.names.TestName
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.core.spec.style.scopes.*
 import io.kotest.core.test.TestScope
-import io.kotest.datatest.withData
+
 import io.kotest.matchers.comparables.shouldBeEqualComparingTo
 import org.openapitools.codegen.CodegenConfig
 import org.openapitools.codegen.CodegenConstants
@@ -30,9 +30,9 @@ class CompilationTest : FreeSpec() {
   private val openApiFiles31 = openApiFiles / "3_1"
 
   init {
-    "focus".config(enabled = true) {
-      val openapiFile = openApiFiles30 / "unsigned-test.yaml"
-//      val openapiFile = openApiFiles30 / "unusedSchemas.yaml"
+    // used for manual test runs / debugging
+    "specific test".config(enabled = false) {
+      val openapiFile = openApiFiles30 / "simplifyOneOfAnyOf_test.yaml"
       println("From: ${openapiFile.absPath}")
       GlobalSettings.setProperty(CodegenConstants.SKIP_FORM_MODEL, "false")
       generateOpenApi(
@@ -48,7 +48,7 @@ class CompilationTest : FreeSpec() {
     }
 
 
-    // generate spring for code. just used for debugging
+    // generate using spring generator - just used for debugging
     "regression spring".config(false) {
       val openapiFile = openApiFiles30 / "form-multipart-binary-array.yaml"
       generateOpenApi(openapiFile = openapiFile, to = testOut, generator = springGen(testOut))
@@ -105,8 +105,8 @@ class CompilationTest : FreeSpec() {
     this.also { importMapping().remove("Date") }
 
   private fun CodegenConfig.addUnsigneds(): CodegenConfig = run {
-    this.importMapping().put("UnsignedInteger", "java.lang.Long") // map to Long
-    this.importMapping().put("UnsignedLong", "java.lang.Long")
+    this.importMapping()["UnsignedInteger"] = "java.lang.Long" // map to Long
+    this.importMapping()["UnsignedLong"] = "java.lang.Long"
     this
   }
 
@@ -117,6 +117,7 @@ class CompilationTest : FreeSpec() {
 
     // generates @BindingName("pn0") pn0: java.math.BigDecimal = 10.0. We have to revisit that to handle default values of params.
     openApiFiles30 / "issue_10865_default_values.yaml",
+    openApiFiles30 / "unusedSchemas.yaml",
 
     // SpecialCharacterEnum
     openApiFiles30 / "python" / "petstore-with-fake-endpoints-models-for-testing.yaml",
@@ -146,6 +147,12 @@ class CompilationTest : FreeSpec() {
 
     // classname Deprecated overlaps with @Deprecated annotation
     openApiFiles30 / "model-deprecated.yaml",
+
+    // referenced schema Bar does not exist
+    openApiFiles30 / "unsigned-test.yaml",
+
+    // some internal NPE
+    openApiFiles30 / "simplifyOneOfAnyOf_test.yaml",
   ).map { it.absPath }.toSet()
 
   private fun disableTestFilter(filePath: String): Boolean = disabledTests.contains(filePath)
@@ -193,6 +200,10 @@ class CompilationTest : FreeSpec() {
       }
 
       (openApiFiles30 / "petstore-with-object-as-parameter.yaml").absPath -> {
+        GlobalSettings.setProperty(CodegenConstants.SKIP_FORM_MODEL, "false")
+      }
+
+      (openApiFiles30 / "unusedSchemas.yaml").absPath -> {
         GlobalSettings.setProperty(CodegenConstants.SKIP_FORM_MODEL, "false")
       }
     }
