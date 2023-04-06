@@ -43,7 +43,7 @@ class {{classname}} {
   ): HttpResponseMessage {
     {{#lambda.indented}}{{#removeEmptyLines}}{{>apiMethodBodyParameters}}{{/removeEmptyLines}}{{/lambda.indented}}
     val response = api.{{operationId}}(
-      request = request
+      rawRequest = rawRequest
       {{#vendorExtensions.x-azure-additional-properties}},{{parameterName}} = {{parameterName}}{{/vendorExtensions.x-azure-additional-properties}}
       {{#allParams}}{{#trim1L}}{{^isFormParam}},
         {{paramName}} =
@@ -55,7 +55,7 @@ class {{classname}} {
         {{^defaultValue}}{{#required}}!!{{/required}}{{/defaultValue}}
       {{/isFormParam}}{{/trim1L}}{{/allParams}})
 
-    val builder = request.createResponseBuilder(response.status).body(response.body)
+    val builder = rawRequest.createResponseBuilder(response.status).body(response.body)
     if(response.contentType != null){
       builder.header("Content-Type",response.contentType)
     }

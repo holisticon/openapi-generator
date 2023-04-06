@@ -1,6 +1,6 @@
 @HttpTrigger(name = "req", methods = [HttpMethod.{{httpMethod}}], authLevel = AuthorizationLevel.ANONYMOUS, route = "{{#formatPath}}{{path}}{{/formatPath}}"){{!
 -- request --
--}}request: HttpRequestMessage<{{#bodyParam}}{{dataType}}{{/bodyParam}}{{^bodyParam}}{{^formParams.isEmpty}}String{{/formParams.isEmpty}}{{^formParams}}Void{{/formParams}}{{/bodyParam}}>,{{!
+-}}rawRequest: HttpRequestMessage<{{#bodyParam}}{{dataType}}{{/bodyParam}}{{^bodyParam}}{{^formParams.isEmpty}}String{{/formParams.isEmpty}}{{^formParams}}Void{{/formParams}}{{/bodyParam}}>,{{!
 -- path parameters --
 -}}{{#pathParams}}@BindingName("{{paramName}}") {{paramName}}: {{dataType}}{{^defaultValue}}?{{/defaultValue}}{{#defaultValue}} = {{defaultValue}}{{/defaultValue}}, {{/pathParams}}{{!
 -- vendorExtensions ---

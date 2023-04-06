@@ -1,11 +1,11 @@
 {{#debug}}apiMethodBodyParameters.mustache{{/debug}}
 
 // body parameter {{! ----------------------  bodyParam ---------------------- }}
-{{#bodyParam}}val {{#bodyParam}}{{paramName}}{{/bodyParam}} = request.body {{/bodyParam}}
+{{#bodyParam}}val {{#bodyParam}}{{paramName}}{{/bodyParam}} = rawRequest.body {{/bodyParam}}
 
 // query parameter {{! ----------------------  queryParams ---------------------- for keywords: baseName='data', paramName='`data`' }}
 {{#queryParams}}
-val {{paramName}}: {{datatypeWithEnum}}{{^datatypeWithEnum}}{{dataType}}{{/datatypeWithEnum}}{{^defaultValue}}?{{/defaultValue}} = request.queryParameters["{{baseName}}"]{{#rmNl}}{{>parseQueryParameter}}{{/rmNl}}
+val {{paramName}}: {{datatypeWithEnum}}{{^datatypeWithEnum}}{{dataType}}{{/datatypeWithEnum}}{{^defaultValue}}?{{/defaultValue}} = rawRequest.queryParameters["{{baseName}}"]{{#rmNl}}{{>parseQueryParameter}}{{/rmNl}}
 {{/queryParams}}
 
 // path parameter {{! ----------------------  pathParams ---------------------- for non basic type handling }}
@@ -26,7 +26,7 @@ val {{paramName}}: {{datatypeWithEnum}}{{^datatypeWithEnum}}{{dataType}}{{/datat
 
 // header parameter{{! ----------------------  headerParams ----------------------}}
 {{#headerParams}}
-val {{paramName}} = request.headers["{{baseName}}"]{{#rmNl}}{{>parseQueryParameter}}{{/rmNl}}
+val {{paramName}} = rawRequest.headers["{{baseName}}"]{{#rmNl}}{{>parseQueryParameter}}{{/rmNl}}
 {{/headerParams}}
 
 // cookie parameter{{! ----------------------  cookieParams ----------------------}}
@@ -43,7 +43,7 @@ val notSetRequiredParams = mutableSetOf<String>()
 {{/required}}{{/defaultValue}}{{/allParams}}
 
 if(notSetRequiredParams.isNotEmpty()) {
-  return request
+  return rawRequest
     .createResponseBuilder(HttpStatus.BAD_REQUEST)
     .body("Required parameters missing: ${notSetRequiredParams.joinToString { ", " }}")
     .build()

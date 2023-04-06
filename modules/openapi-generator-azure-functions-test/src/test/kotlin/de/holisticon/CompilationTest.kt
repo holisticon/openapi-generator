@@ -31,8 +31,10 @@ class CompilationTest : FreeSpec() {
 
   init {
     "focus".config(enabled = true) {
-      val openapiFile = openApiFiles30 / "issue_8535.yaml"
+      val openapiFile = openApiFiles30 / "unsigned-test.yaml"
+//      val openapiFile = openApiFiles30 / "unusedSchemas.yaml"
       println("From: ${openapiFile.absPath}")
+      GlobalSettings.setProperty(CodegenConstants.SKIP_FORM_MODEL, "false")
       generateOpenApi(
         openapiFile = openapiFile, to = "target" / "generated-sources",
         generator = CompilationTestHelper.kotlinAzureServerCodegen(null, "target" / "generated-sources"),
@@ -139,6 +141,11 @@ class CompilationTest : FreeSpec() {
     // kotlin correctly doesn't handle  listOfNulls: kotlin.Array<kotlin.Nothing>?
     openApiFiles30 / "issue_7651.yaml",
 
+    // it's invalid on purpose and throws an exception
+    openApiFiles30 / "inline_model_resolver.yaml",
+
+    // classname Deprecated overlaps with @Deprecated annotation
+    openApiFiles30 / "model-deprecated.yaml",
   ).map { it.absPath }.toSet()
 
   private fun disableTestFilter(filePath: String): Boolean = disabledTests.contains(filePath)
@@ -182,6 +189,10 @@ class CompilationTest : FreeSpec() {
       }
 
       (openApiFiles30 / "form-multipart-binary-array.yaml").absPath -> {
+        GlobalSettings.setProperty(CodegenConstants.SKIP_FORM_MODEL, "false")
+      }
+
+      (openApiFiles30 / "petstore-with-object-as-parameter.yaml").absPath -> {
         GlobalSettings.setProperty(CodegenConstants.SKIP_FORM_MODEL, "false")
       }
     }
