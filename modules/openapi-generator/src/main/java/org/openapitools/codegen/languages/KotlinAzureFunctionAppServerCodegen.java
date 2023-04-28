@@ -292,7 +292,7 @@ public class KotlinAzureFunctionAppServerCodegen extends AbstractKotlinCodegen {
         };
 
         final Mustache.Lambda trimToOneLine = (fragment, writer) -> {
-            if (genInterfaceImpl) writer.write(
+            writer.write(
                     Arrays.stream(fragment.execute().split("\\n")).map(String::trim).collect(Collectors.joining())
             );
         };
